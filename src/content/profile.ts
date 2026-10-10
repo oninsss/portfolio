@@ -59,14 +59,18 @@ export const siteStack = ["Next.js", "React", "TypeScript", "Tailwind CSS"];
 
 export const portrait:
   | {
-      src: string;
+      /** Shown in the light theme (dark shirt). */
+      light: string;
+      /** Shown in the dark theme (light shirt). */
+      dark: string;
       alt: string;
       zoom?: number;
       focus?: string;
     }
   | undefined = {
-  src: "/temp-profile.jpg",
+  light: "/profile/portrait-light.webp",
+  dark: "/profile/portrait-dark-v2.webp",
   alt: "Portrait of onins",
-  zoom: 1.7,
-  focus: "46% 47%",
+  zoom: 1,
+  focus: "50% 0%",
 };

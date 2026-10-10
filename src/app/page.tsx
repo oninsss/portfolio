@@ -50,7 +50,7 @@ export default function Home() {
           <div
             className={
               portrait
-                ? "grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-5 gap-y-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-x-12 lg:gap-y-0"
+                ? "grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-5 gap-y-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-12 lg:gap-y-0"
                 : undefined
             }
           >
