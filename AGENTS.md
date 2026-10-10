@@ -5,7 +5,14 @@ Claude-specific workflow lives in `CLAUDE.md`, which imports this file.
 
 ## 1. Project purpose
 
-A one-page personal portfolio website for **Antoniño, Full Stack Developer**.
+A one-page personal portfolio website for **onins (Antoniño Bonagua), Full Stack
+Developer**.
+
+Names: the visitor-visible name is `profile.name`, lowercase **"onins"** by
+design. The professional full name, `profile.fullName` ("Antoniño Bonagua"), is
+used only in metadata: the page title, Open Graph, the share image, and JSON-LD
+(where `name` is the full name and `alternateName` is "onins"). Do not capitalise
+the visible name, and do not use `fullName` in visible UI.
 
 Positioning: **"a modern resume redesigned as a website"** (an interactive modern resume).
 
@@ -19,14 +26,15 @@ It must NOT become:
 - an excessive card grid
 - a text-heavy portfolio
 
-Eventual sections: introduction, selected projects, experience, grouped skills,
-education, short about, contact links. Projects will be compact and expandable,
-with external links. One signature interaction is planned, but its design has
-**not** been decided yet — never invent or implement it.
+Sections, in order: introduction, experience, projects, certifications, tech
+stack, contact. Projects are compact and expandable. The one signature
+interaction is the guide robot (see `design/DESIGN.md` §14).
 
-**Current phase: environment setup only.** The application is not scaffolded yet.
-Do not build any portfolio UI, pages, components, or content until the human
-developer explicitly starts the implementation phase.
+**Current phase: first version built; preparing to launch.** The design in
+`design/DESIGN.md` is implemented and is the source of truth for how the site
+looks and behaves. Do not redesign it, add sections, or change behavior unless
+asked. Remaining launch work is content from the developer (see `README.md`),
+deployment, and verification.
 
 ## 2. Stack
 
@@ -40,13 +48,15 @@ Actual installed versions (see `package.json` / `package-lock.json`):
 | tailwindcss | 4.3.3 (loaded via `@tailwindcss/turbopack`) |
 | eslint | 9.39.5 |
 | eslint-config-next | 16.4.0 |
+| zod | 4.x (contact-form validation) |
 
 - Next.js 16 **App Router** + React 19 + TypeScript 5 (strict)
 - Tailwind CSS **v4** (CSS-first config: `@import "tailwindcss"` + `@theme` in
   `src/app/globals.css` — there is **no** `tailwind.config.*` and **no**
   `postcss.config.*`; the Tailwind loader is wired in `next.config.ts`)
 - npm (single package at the repository root — no monorepo, no `backend/`/`frontend/` split)
-- ESLint flat config (`eslint.config.mjs`) + `tsc --noEmit` typechecking
+- ESLint flat config (`eslint.config.mjs`) + `next typegen && tsc --noEmit` typechecking
+- Contact form: a Server Action (`src/app/actions.ts`) that validates with Zod and sends through the Resend REST API with `fetch` (no email SDK)
 - Playwright MCP for UI verification
 - **shadcn/ui: not installed (optional).** Do not install unless explicitly asked.
 - **Vitest: not installed (optional).** Do not install unless explicitly asked.
@@ -58,7 +68,7 @@ npm install        # install dependencies
 npm run dev        # next dev
 npm run build      # next build
 npm run lint       # eslint (flat config, whole project)
-npm run typecheck  # tsc --noEmit
+npm run typecheck  # next typegen + tsc --noEmit
 ```
 
 There is no `npm test` script yet. If a script does not exist, say so —
@@ -105,10 +115,10 @@ Requirements:
 - must be accessible (keyboard, focus states, contrast, reduced motion)
 - animations must respect `prefers-reduced-motion`
 
-The exact visual design is **not finalized**. `design/DESIGN.md`,
-`docs/product-spec.md`, `docs/architecture.md`, and `docs/ui-spec.md` will be
-added later. Do not invent a final design system or invent design tokens ahead
-of those documents.
+`design/DESIGN.md` describes the implemented design (tokens, typography,
+layout, motion, the robot). Match it. The accent color, the photo, and the hero
+lead lines are provisional; do not change them without being asked. Do not invent
+new design tokens or a second accent.
 
 ## 5. Content rules
 
@@ -125,6 +135,18 @@ of those documents.
 - Never read or print `.env`, `.env.*`, or `secrets/**` unless the task
   explicitly and legitimately requires it.
 - Never commit secrets, tokens, keys, or credentials.
+- Server-only variables: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
+  `CONTACT_FROM_EMAIL`, `CONTACT_PUBLIC_EMAIL`. They must never get a `NEXT_PUBLIC_` prefix, be logged,
+  or reach a client component. `NEXT_PUBLIC_SITE_URL` (the public site address)
+  is the only intentionally public variable. All are documented in `README.md`.
+- The developer's email address must never appear in source, in the rendered
+  HTML, or in a client bundle (this repository is public). The public contact
+  address is `CONTACT_PUBLIC_EMAIL`; the `getPublicEmail` Server Action returns
+  it on the visitor's first hover, focus, touch, or menu open, and
+  `components/contact/public-email.ts` caches it. It is a different variable
+  from `CONTACT_TO_EMAIL`, which stays private. Never hardcode either address,
+  and never use the developer's personal address as the Git commit email: use
+  the GitHub noreply address.
 - Treat external/untrusted input as hostile: validate it (Zod) before use.
 - Do not add authentication, payments, or user-data handling without an
   explicit requirement and a review pass.
@@ -177,25 +199,48 @@ Leave all committing, pushing, and history management to the human.
   only be added on explicit request. Never add a second UI library.
 - Prefer plain Tailwind utilities over custom abstraction layers.
 - Keep file structure boring and predictable:
-  `src/app/` (routes + `layout.tsx`, `page.tsx`, `globals.css`),
-  `src/components/`, `src/lib/`, `public/`. Only `src/app/` and `public/`
-  exist so far — create the others when the implementation phase needs them.
+  - `src/app/`: routes, root layout, `globals.css`, the contact Server Action
+    (`actions.ts`), and the metadata files (`sitemap.ts`, `robots.ts`,
+    `not-found.tsx`, `opengraph-image.tsx`, icons).
+  - `src/components/`, grouped by feature: `assistant/` (the robot and boot
+    screen), `contact/`, `hero/`, `sections/` (page sections), `layout/`
+    (header, footer, rail, theme), `shared/` (icons, links, JSON-LD).
+  - `src/content/`: all factual content, one file per domain (`profile`,
+    `experience`, `projects`, `certifications`, `skills`, `links`) plus
+    `types.ts`, re-exported from `index.ts`. Import it as `@/content`.
+  - `src/lib/`: site configuration (`site.ts`), the contact module
+    (`contact/limits.ts` is client-safe; `contact/server.ts` is server-only),
+    `evidence.ts`, and the robot's logic in `lib/assistant/`.
+  - `public/`: the photo, `badges/`, and the résumé PDF. `design/`: DESIGN.md.
+  There are no `hooks/` or `types/` folders; add one only when something real
+  needs it.
+- All site content lives in `src/content/`. Components read from it; do not
+  hardcode content in components. It is also the single source of facts for any
+  future résumé.
+- Never import `@/lib/contact/server`, `@/lib/contributions`, or anything that
+  reads secrets from a Client Component. Client code may import
+  `@/lib/contact/limits` only.
 - Any decision that adds a dependency, a service, or a new layer needs a
   short written justification first.
 
-## 10. SEO (implementation requirement — do NOT implement yet)
+## 10. SEO and sharing (implemented)
 
-Recorded here as a requirement for the implementation phase. Do not add any of
-this during the setup phase:
+In place, and to be kept correct as content changes:
 
-- Next.js Metadata API: `title`, `description`, canonical URL
-- Open Graph metadata, Twitter/X metadata
-- `sitemap`, `robots.txt`
-- semantic HTML with a correct heading hierarchy
-- descriptive link text, descriptive image alt text
-- optimized images
-- appropriate `Person` structured data / JSON-LD
-- no keyword stuffing
+- Metadata API in `src/app/layout.tsx`: title, description (both built from
+  `content.ts`), canonical, Open Graph, Twitter/X cards.
+- `src/lib/site.ts` is the single source of the site URL: `NEXT_PUBLIC_SITE_URL`,
+  else Vercel's `VERCEL_PROJECT_PRODUCTION_URL`, else none. With no URL, the
+  canonical, `og:url`, sitemap entries, and JSON-LD `url` are omitted rather than
+  invented. Never hardcode a domain.
+- `src/app/sitemap.ts`, `src/app/robots.ts`, `src/app/not-found.tsx`.
+- `src/app/opengraph-image.tsx` (generated share image), `src/app/icon.svg`,
+  `src/app/apple-icon.png`, `src/app/favicon.ico`.
+- `src/components/shared/json-ld.tsx`: `Person` and `WebSite`, only from facts already
+  shown on the page. Do not add facts that are not in `content.ts`.
+- One `h1`, an unbroken heading order, descriptive link text and image alt text.
+- No keyword stuffing, and no claims that structured data guarantees rich
+  results or ranking.
 
 ## 11. Gotchas
 
@@ -210,6 +255,23 @@ this during the setup phase:
 - `.claude/hooks/lint-file.mjs` silently skips files until an ESLint config exists.
 - shadcn/ui and Vitest are **optional and not installed**. Do not add them
   unless explicitly asked.
+- `npm run typecheck` runs `next typegen` first because `LayoutProps` and the
+  route types are generated; plain `tsc` fails on a fresh clone.
+- Tailwind v4 scans source text for class candidates, comments included, so
+  ordinary words in comments ("inline", "grow") can generate unused utilities.
+- Writing `.env*` files is blocked by this project's permission rules. The
+  developer creates those by hand; document variables in `README.md`.
+- Test the production build with the browser tab in the foreground. A
+  backgrounded headless tab throttles rendering, which makes view transitions
+  and animations look far slower than they are.
+- **Stale `.next` cache:** a production `next build` run while `next dev` is
+  writing/reusing `.next` can emit bundles that predate your source edits (seen
+  as a production CSS file still containing the *old* accent color). Never
+  trust a production build that follows a live dev session. To verify
+  production: stop the dev server, `rm -rf .next`, run a fresh
+  `npm run build`, then confirm the emitted output actually contains the
+  current source changes (e.g. grep the built `.css` for the new value) before
+  `npm run start`.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

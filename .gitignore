@@ -10,6 +10,8 @@ secrets/
 .vscode/settings.json
 .idea/
 *.local
+opencode.json
+.opencode/
 
 # Dependencies and generated artifacts
 node_modules/
@@ -19,6 +21,7 @@ build/
 dist/
 coverage/
 *.tsbuildinfo
+.eslintcache
 next-env.d.ts
 .vercel/
 
