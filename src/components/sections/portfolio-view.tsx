@@ -20,25 +20,30 @@ import {
 
 export function HeroPhoto() {
   if (!portrait) return null;
+  const photo = portrait;
 
   return (
-    <div className="group w-[5.5rem] lg:h-full lg:w-full">
-      <div className="relative aspect-[4/5] overflow-hidden rounded-xl border border-rule lg:aspect-auto lg:h-full lg:min-h-[14rem] lg:rounded-2xl">
-        <Image
-          src={portrait.src}
-          alt={portrait.alt}
-          fill
-          loading="eager"
-          fetchPriority="high"
-          sizes="(min-width: 1024px) 240px, 88px"
-          style={
-            {
-              "--zoom": portrait.zoom ?? 1,
-              transformOrigin: portrait.focus ?? "50% 50%",
-            } as CSSProperties
-          }
-          className="object-cover [scale:var(--zoom)] transition-[scale] duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:[scale:calc(var(--zoom)*1.04)] motion-reduce:transition-none"
-        />
+    <div className="group w-22 lg:w-full">
+      <div className="relative aspect-[4/5] overflow-hidden rounded-xl border border-accent lg:rounded-2xl">
+        {(["light", "dark"] as const).map((theme) => (
+          <Image
+            key={theme}
+            src={photo[theme]}
+            alt={theme === "light" ? photo.alt : ""}
+            aria-hidden={theme === "light" ? undefined : true}
+            fill
+            loading="eager"
+            fetchPriority="high"
+            sizes="(min-width: 1024px) 240px, 88px"
+            style={
+              {
+                "--zoom": photo.zoom ?? 1,
+                transformOrigin: photo.focus ?? "50% 50%",
+              } as CSSProperties
+            }
+            className={`portrait-${theme} object-cover object-top [scale:var(--zoom)] transition-[scale] duration-700 ease-[cubic-bezier(0.2,0.8,0.2,1)] group-hover:[scale:calc(var(--zoom)*1.04)] motion-reduce:transition-none`}
+          />
+        ))}
       </div>
     </div>
   );

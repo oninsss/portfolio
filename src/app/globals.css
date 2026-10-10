@@ -784,6 +784,30 @@ details[open] .cert-body {
   }
 }
 
+/* Hero portrait: one image per theme, stacked; the theme picks which shows.
+   The theme toggle's view transition (or the .theme-fade fallback) crossfades them. */
+.portrait-dark {
+  opacity: 0;
+}
+
+[data-theme="dark"] .portrait-dark {
+  opacity: 1;
+}
+
+[data-theme="dark"] .portrait-light {
+  opacity: 0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .portrait-dark {
+    opacity: 1;
+  }
+
+  :root:not([data-theme="light"]) .portrait-light {
+    opacity: 0;
+  }
+}
+
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -813,6 +837,7 @@ html.theme-fade *::after {
     background-color 380ms ease,
     color 380ms ease,
     border-color 380ms ease,
+    opacity 380ms ease,
     fill 380ms ease,
     stroke 380ms ease !important;
 }
