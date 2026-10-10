@@ -238,6 +238,8 @@ In place, and to be kept correct as content changes:
   `src/app/apple-icon.png`, `src/app/favicon.ico`.
 - `src/components/shared/json-ld.tsx`: `Person` and `WebSite`, only from facts already
   shown on the page. Do not add facts that are not in `content.ts`.
+- `verification.google` in `src/app/layout.tsx` is the public Google Search Console
+  ownership token (not a secret). Keep it, or Search Console may unverify the site.
 - One `h1`, an unbroken heading order, descriptive link text and image alt text.
 - No keyword stuffing, and no claims that structured data guarantees rich
   results or ranking.

@@ -39,6 +39,9 @@ export const metadata: Metadata = {
     title,
     description,
   },
+  verification: {
+    google: "9jhstaJnMH1nnNXPKKE-vh5iCTFbTv9PZwAx2wT2boQ",
+  },
 };
 
 const themeInit = `(function(){try{var t=localStorage.getItem("theme");var r=document.documentElement;if(t==="light"||t==="dark"){r.dataset.theme=t}else{delete r.dataset.theme}}catch(e){}})();`;
