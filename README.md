@@ -45,7 +45,7 @@ Set these in your host's environment settings, never in the repository. Only `NE
 | --- | --- | --- |
 | `RESEND_API_KEY` | for the contact form | API key from [Resend](https://resend.com/api-keys) |
 | `CONTACT_TO_EMAIL` | for the contact form | Where contact-form messages are delivered |
-| `CONTACT_PUBLIC_EMAIL` | for the email links | The address visitors see and can write to. Use a dedicated alias, not your main inbox. It is never in the repository, the HTML, or the JavaScript bundle: the server returns it on a visitor's first hover, focus, or touch. If unset, the email options say they are unavailable. |
+| `CONTACT_PUBLIC_EMAIL` | for the email links | The address visitors see and can write to. Use a dedicated address, such as a separate inbox for the portfolio, not your personal one. It is never in the repository, the HTML, or the JavaScript bundle: the server returns it on a visitor's first hover, focus, or touch. If unset, the email options say they are unavailable. |
 | `CONTACT_FROM_EMAIL` | no | Sender shown on messages, on a domain verified in Resend. Defaults to `Portfolio <onboarding@resend.dev>`, which only delivers to the Resend account owner's own email |
 | `NEXT_PUBLIC_SITE_URL` | no | The site's public address, for example `https://your-domain.com`. Drives the canonical URL, social-share URLs, sitemap, and structured data. On Vercel, if unset, the production domain Vercel provides is used. If neither is available, those URL-dependent tags are left out. |
 
