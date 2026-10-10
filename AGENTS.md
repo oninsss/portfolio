@@ -30,24 +30,43 @@ developer explicitly starts the implementation phase.
 
 ## 2. Stack
 
-- Next.js (App Router) + React + TypeScript
-- Tailwind CSS + shadcn/ui
-- npm (single package at the repository root — no monorepo, no `backend/`/`frontend/` split)
-- ESLint + TypeScript typechecking
-- Vitest where unit logic is worth testing
-- Playwright MCP for UI verification
+Actual installed versions (see `package.json` / `package-lock.json`):
 
-Commands (run from the repository root, once the app is scaffolded):
+| Package | Version |
+|---|---|
+| next | 16.4.0 |
+| react / react-dom | 19.3.0 |
+| typescript | 5.9.3 |
+| tailwindcss | 4.3.3 (loaded via `@tailwindcss/turbopack`) |
+| eslint | 9.39.5 |
+| eslint-config-next | 16.4.0 |
+
+- Next.js 16 **App Router** + React 19 + TypeScript 5 (strict)
+- Tailwind CSS **v4** (CSS-first config: `@import "tailwindcss"` + `@theme` in
+  `src/app/globals.css` — there is **no** `tailwind.config.*` and **no**
+  `postcss.config.*`; the Tailwind loader is wired in `next.config.ts`)
+- npm (single package at the repository root — no monorepo, no `backend/`/`frontend/` split)
+- ESLint flat config (`eslint.config.mjs`) + `tsc --noEmit` typechecking
+- Playwright MCP for UI verification
+- **shadcn/ui: not installed (optional).** Do not install unless explicitly asked.
+- **Vitest: not installed (optional).** Do not install unless explicitly asked.
+
+Commands (run from the repository root):
 
 ```bash
 npm install        # install dependencies
-npm run dev        # dev server
-npm run lint       # ESLint
+npm run dev        # next dev
+npm run build      # next build
+npm run lint       # eslint (flat config, whole project)
 npm run typecheck  # tsc --noEmit
-npm test           # Vitest (only once configured)
 ```
 
-If a script does not exist yet, say so — do not pretend it ran.
+There is no `npm test` script yet. If a script does not exist, say so —
+do not pretend it ran.
+
+Note: `npm run lint` currently exits `0` even when it prints warnings, because
+`eslint-config-next` sets these rules to warning severity. Judge lint by its
+**output**, not only by its exit code.
 
 ## 3. Development principles
 
@@ -114,15 +133,17 @@ of those documents.
 
 Before saying a task is complete:
 
-1. Run `npm run lint`.
+1. Run `npm run lint` and read its output (warnings do not change the exit code).
 2. Run `npm run typecheck`.
-3. Run tests when applicable (`npm test`).
-4. If any UI changed, verify it with **Playwright MCP** (real screenshots and
+3. Run `npm run build` when routing, layout, config, or types changed.
+4. Run tests when applicable. **No test runner is installed yet** — if none
+   exists, say the tests were not applicable instead of implying they passed.
+5. If any UI changed, verify it with **Playwright MCP** (real screenshots and
    interaction), not by assumption.
-5. Report the **actual** output/results of each check.
+6. Report the **actual** output/results of each check.
 
-Never claim a test, lint, typecheck, or UI check passed without actually running it.
-If a check could not be run, say exactly that.
+Never claim a test, lint, typecheck, build, or UI check passed without actually
+running it. If a check could not be run, say exactly that.
 
 ## 8. Git restrictions
 
@@ -146,15 +167,19 @@ Leave all committing, pushing, and history management to the human.
 ## 9. Architecture decision guidelines
 
 - One Next.js application at the repository root. No separate backend package.
-- App Router only. Keep route structure shallow — this is a one-page site.
+- App Router only, routes live in `src/app/`. Keep route structure shallow —
+  this is a one-page site.
 - Server Components by default; Client Components only for real interactivity.
 - Data is static/local for now: no database, no API layer, no CMS unless a
   later spec explicitly requires one.
 - No state management library until a concrete need appears.
-- No component library beyond shadcn/ui.
+- Component libraries: **none installed today**. shadcn/ui is optional and may
+  only be added on explicit request. Never add a second UI library.
 - Prefer plain Tailwind utilities over custom abstraction layers.
 - Keep file structure boring and predictable:
-  `app/`, `src/components/`, `src/lib/`, `public/`.
+  `src/app/` (routes + `layout.tsx`, `page.tsx`, `globals.css`),
+  `src/components/`, `src/lib/`, `public/`. Only `src/app/` and `public/`
+  exist so far — create the others when the implementation phase needs them.
 - Any decision that adds a dependency, a service, or a new layer needs a
   short written justification first.
 
@@ -176,7 +201,22 @@ this during the setup phase:
 
 <!-- Add non-obvious things here as you hit them. -->
 
-- The repository is not a Git repository yet; the human initializes and commits Git.
-- `package.json` and the Next.js app are scaffolded separately, before implementation begins.
-- The lint hook (`.claude/hooks/lint-file.mjs`) silently skips files until an
-  ESLint config exists in the repository.
+- Git is initialized; the human does all committing and history management.
+- The lint hook (`.claude/hooks/lint-file.mjs`) locates the owning `package.json`
+  by walking up from the edited file, so it works from the repo root.
+- This project's ESLint rules are configured at **warning** severity, so
+  `npx eslint` exits `0` even when it reports problems. The hook therefore
+  exits `2` on warnings as well as errors. Read the output, not just the code.
+- `.claude/hooks/lint-file.mjs` silently skips files until an ESLint config exists.
+- shadcn/ui and Vitest are **optional and not installed**. Do not add them
+  unless explicitly asked.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

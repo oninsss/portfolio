@@ -1,15 +1,18 @@
 #!/usr/bin/env node
 // Post-edit hook: run ESLint (--fix) on the file that was just edited.
 //
-// Single-package repository (Next.js at the repo root). There is no
-// backend/ or frontend/ split here.
+// Single Next.js package. The hook does NOT assume the app lives at the repo
+// root: it walks up from the edited file to the nearest package.json, so it
+// keeps working if the app sits in a subdirectory.
 //
 // Behaviour:
 //   - reads the edited file path from the hook JSON payload on stdin
 //   - ignores unsupported extensions and non-project directories
-//   - skips quietly while the project has no ESLint config yet
-//   - runs `eslint --fix <file>` from the repository root
-//   - exits 2 (so the agent sees it) when ESLint reports problems
+//   - skips quietly while no ESLint config exists yet
+//   - runs `eslint --fix <file>` from the owning package directory
+//   - exits 2 whenever ESLint reports a problem (error OR warning) so the
+//     agent sees it. This project configures its rules as "warn", so a plain
+//     non-zero-exit check would never surface anything.
 import { readFileSync, existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import path from "node:path";
@@ -34,34 +37,55 @@ const rel = path.relative(root, abs);
 // Outside the repository, or inside generated/tooling directories: skip.
 if (rel.startsWith("..") || path.isAbsolute(rel)) process.exit(0);
 const parts = rel.split(path.sep);
-if (parts.some((p) => ["node_modules", ".next", ".git", ".claude", ".playwright-mcp"].includes(p))) {
+const IGNORED = ["node_modules", ".next", ".git", ".claude", ".playwright-mcp", "out", "build", "coverage"];
+if (parts.some((p) => IGNORED.includes(p))) process.exit(0);
+
+// --- 3. find the package that owns this file --------------------------------
+const rootAbs = path.resolve(root);
+let pkgDir = path.dirname(abs);
+let found = null;
+while (true) {
+  if (existsSync(path.join(pkgDir, "package.json"))) {
+    found = pkgDir;
+    break;
+  }
+  const here = path.resolve(pkgDir);
+  if (here === rootAbs) break; // repository root already checked
+  if (!here.startsWith(rootAbs + path.sep)) break; // would leave the repo
+  const parent = path.dirname(here);
+  if (parent === here) break; // filesystem root
+  pkgDir = parent;
+}
+if (!found) {
+  console.error(`[lint-file] skipped ${rel}: no package.json found above this file.`);
   process.exit(0);
 }
+const pkgRoot = found;
 
-// --- 3. skip quietly when the project is not set up yet ---------------------
-if (!existsSync(path.join(root, "package.json"))) process.exit(0);
-
-const hasEslintConfig = [
+const ESLINT_CONFIGS = [
   "eslint.config.js",
   "eslint.config.mjs",
   "eslint.config.cjs",
   "eslint.config.ts",
+  "eslint.config.mts",
+  "eslint.config.cts",
   ".eslintrc",
   ".eslintrc.js",
   ".eslintrc.cjs",
   ".eslintrc.json",
   ".eslintrc.yml",
   ".eslintrc.yaml",
-].some((cfg) => existsSync(path.join(root, cfg)));
-
+];
+const hasEslintConfig = ESLINT_CONFIGS.some((cfg) => existsSync(path.join(pkgRoot, cfg)));
 if (!hasEslintConfig) {
-  console.error(`[lint-file] skipped ${rel}: no ESLint config found in the repository yet.`);
+  console.error(`[lint-file] skipped ${rel}: no ESLint config in ${path.relative(root, pkgRoot) || "."}.`);
   process.exit(0);
 }
 
 // --- 4. run ESLint on the edited file ---------------------------------------
-const r = spawnSync("npx", ["--no-install", "eslint", "--fix", rel], {
-  cwd: root,
+const target = path.relative(pkgRoot, abs);
+const r = spawnSync("npx", ["--no-install", "eslint", "--fix", target], {
+  cwd: pkgRoot,
   encoding: "utf8",
   shell: true,
 });
@@ -71,11 +95,14 @@ if (r.error) {
   process.exit(0); // tooling problems must not block the agent
 }
 
-// `eslint` exits 1 on lint errors, 2 on config/internal errors.
-// Exit code 2 feeds the messages back to the agent so it can fix them.
-if (r.status !== 0) {
-  console.error(r.stdout ?? "");
-  console.error(r.stderr ?? "");
+const out = `${r.stdout ?? ""}${r.stderr ?? ""}`.trim();
+
+// `eslint` exits non-zero on errors, but this project's rules are warnings
+// (severity 1), so it exits 0 with problems on screen. Surface both.
+const reportedProblem = /\b(error|warning)\b\s/i.test(out) && /\d+:\d+/.test(out);
+
+if (r.status !== 0 || reportedProblem) {
+  console.error(out);
   process.exit(2);
 }
 

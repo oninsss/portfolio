@@ -1,14 +1,18 @@
 ---
 name: frontend-developer
-description: Builds and edits UI in this repository's stack (Next.js App Router, React, TypeScript, Tailwind CSS, shadcn/ui). Use for any page, component, or styling work.
+description: Builds and edits UI in this repository's stack (Next.js App Router, React, TypeScript, Tailwind CSS). Use for any page, component, or styling work.
 tools: Read, Edit, Write, Grep, Glob, Bash
 ---
 
 You build UI in this repository's stack:
 
-- **Next.js App Router** (single package at the repository root)
-- **React** + **TypeScript**
-- **Tailwind CSS** + **shadcn/ui**
+- **Next.js App Router** (single package at the repository root; routes in `src/app/`)
+- **React 19** + **TypeScript 5** (strict, `@/*` → `./src/*`)
+- **Tailwind CSS v4** — CSS-first: config lives in `src/app/globals.css`
+  (`@import "tailwindcss"` + `@theme`). There is no `tailwind.config.*` and no
+  `postcss.config.*`; the loader is registered in `next.config.ts`.
+- **shadcn/ui is NOT installed** (optional). Do not install it, and do not add
+  any other component library, unless explicitly asked.
 - **npm** for every package command (never pnpm/yarn/bun)
 
 `AGENTS.md` is the source of truth for project purpose, design principles,
@@ -21,8 +25,9 @@ content rules, and verification. Read and follow it.
 - Server Components by default. Add `"use client"` only where interactivity,
   browser APIs, or local state genuinely require it.
 - Keep client-side JavaScript to the minimum.
-- Reuse existing components in `src/components/` (and shadcn/ui primitives in
-  `src/components/ui/`) before creating new ones.
+- Reuse existing components before creating new ones. `src/components/` does not
+  exist yet — create it when the first shared component is needed. There are no
+  shadcn/ui primitives; build from semantic HTML + Tailwind utilities.
 - Do not add another component library, CSS framework, or icon package.
 - Keep route structure shallow — this is a one-page site.
 
@@ -61,12 +66,14 @@ content rules, and verification. Read and follow it.
 
 ## Definition of done
 
-1. `npm run lint` — real output
+1. `npm run lint` — real output (read it: warnings do not change the exit code)
 2. `npm run typecheck` — real output
-3. `npm test` if relevant tests exist
-4. UI changed → verify with **Playwright MCP** (screenshots at mobile and
+3. `npm run build` if routing, layout, config, or types changed
+4. Tests only if a runner exists — **none is installed yet**, so say tests were
+   not applicable rather than claiming they passed
+5. UI changed → verify with **Playwright MCP** (screenshots at mobile and
    desktop, plus keyboard/interaction checks). Never assume it renders right.
-5. Report actual results. If a check could not be run, say so plainly.
+6. Report actual results. If a check could not be run, say so plainly.
 
 ## Git
 

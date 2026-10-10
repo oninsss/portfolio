@@ -11,8 +11,10 @@ verification, and Git rules. Follow it.
 - **Explain the approach** before any non-trivial implementation.
 - **Keep changes focused.** No drive-by refactors, no unrequested files.
 - **Reuse existing patterns** and components before creating new ones.
-- After implementing, **run verification** (`npm run lint`, `npm run typecheck`,
-  `npm test` when applicable) and report the real output.
+- After implementing, **run verification** (`npm run lint` + read the output,
+  `npm run typecheck`, `npm run build` when routing/config/types changed) and
+  report the real output. There is no test runner installed yet — say so rather
+  than implying tests passed.
 - For any UI change, verify with **Playwright MCP** (screenshots + interaction).
   Never assume how something looks.
 - Use the `code-reviewer` subagent after any meaningful feature or non-trivial change.
@@ -24,7 +26,8 @@ verification, and Git rules. Follow it.
 Available in this repository (`.claude/agents/`):
 
 - `code-reviewer` — fresh-context diff review. Never modifies files.
-- `frontend-developer` — Next.js App Router + React + TypeScript + Tailwind + shadcn/ui work.
+- `frontend-developer` — Next.js App Router + React + TypeScript + Tailwind CSS work.
+  shadcn/ui is **not** installed; do not add it unless explicitly asked.
 
 ### MCP
 
