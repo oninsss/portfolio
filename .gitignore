@@ -1,0 +1,38 @@
+# Secrets and environment files
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Local credentials / machine-specific files
+.vscode/settings.json
+.idea/
+*.local
+
+# Dependencies and generated artifacts
+node_modules/
+.next/
+out/
+build/
+dist/
+coverage/
+*.tsbuildinfo
+next-env.d.ts
+
+# Temporary AI / browser artifacts
+.claude/settings.local.json
+.playwright-mcp/
+playwright-report/
+test-results/
+.cache/
+tmp/
+*.log
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# NOTE: AGENTS.md, CLAUDE.md, docs/, and design/ are project documentation
+# and are intentionally NOT ignored.
