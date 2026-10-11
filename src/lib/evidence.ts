@@ -4,22 +4,48 @@ export type Source = {
   id: string;
   label: string;
   name: string;
+  mark: string;
 };
 
 export const SITE_ID = "this-site";
 
+// Two letters that stand in for a source's name where there is no room to write it.
+function markOf(label: string): string {
+  const words = label
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .split(/[^A-Za-z0-9]+/)
+    .filter(Boolean);
+  const mark =
+    words.length > 1
+      ? words
+          .slice(0, 2)
+          .map((word) => word[0])
+          .join("")
+      : (words[0] ?? "").slice(0, 2);
+  return mark.toUpperCase() || label.trim().slice(0, 2).toUpperCase() || "?";
+}
+
+const withMark = (source: Omit<Source, "mark">): Source => ({
+  ...source,
+  mark: markOf(source.label),
+});
+
 export const sources: Source[] = [
-  ...projects.map((project) => ({
-    id: project.id,
-    label: project.short ?? project.name,
-    name: project.name,
-  })),
-  ...experience.map((entry) => ({
-    id: entry.id,
-    label: entry.organization,
-    name: `${entry.organization} (${entry.role})`,
-  })),
-  { id: SITE_ID, label: "This site", name: "This portfolio" },
+  ...projects.map((project) =>
+    withMark({
+      id: project.id,
+      label: project.short ?? project.name,
+      name: project.name,
+    }),
+  ),
+  ...experience.map((entry) =>
+    withMark({
+      id: entry.id,
+      label: entry.organization,
+      name: `${entry.organization} (${entry.role})`,
+    }),
+  ),
+  withMark({ id: SITE_ID, label: "This site", name: "This portfolio" }),
 ];
 
 const VISIBLE_PROJECTS = 3;

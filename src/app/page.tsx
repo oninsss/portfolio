@@ -15,7 +15,7 @@ import { portrait, profile } from "@/content";
 function HeroIdentity() {
   return (
     <div id="introduction" className="min-w-0">
-      <div className="mt-4 flex items-baseline">
+      <div className={portrait ? "flex items-baseline min-[480px]:mt-4" : "mt-4 flex items-baseline"}>
         <h1 className="text-[1.75rem] font-medium tracking-tight text-ink min-[360px]:text-4xl sm:text-5xl lg:text-[3.25rem]">
           {profile.name}
         </h1>
@@ -50,19 +50,23 @@ export default function Home() {
           <div
             className={
               portrait
-                ? "grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-5 gap-y-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:items-start lg:gap-x-12 lg:gap-y-0"
+                ? "grid grid-cols-1 gap-y-6 min-[480px]:grid-cols-[11rem_minmax(0,1fr)] min-[480px]:items-center min-[480px]:gap-x-5 sm:gap-x-6 lg:grid-cols-[15rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr] lg:items-start lg:gap-x-12 lg:gap-y-0"
                 : undefined
             }
           >
             {portrait ? (
-              <div className="mt-4 self-start lg:row-span-2 lg:mt-5 lg:self-stretch">
+              <div className="min-[480px]:mt-4 min-[480px]:self-start lg:row-span-2 lg:mt-5 lg:self-stretch">
                 <HeroPhoto />
               </div>
             ) : null}
 
             <HeroIdentity />
 
-            <div className="col-span-2 mt-6 lg:col-span-1">
+            <div
+              className={
+                portrait ? "col-span-full min-[480px]:mt-6 lg:col-span-1" : "mt-6"
+              }
+            >
               <PortfolioLead />
             </div>
 

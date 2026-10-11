@@ -24,6 +24,7 @@ export function JsonLd() {
         "@type": "WebSite",
         "@id": `${siteUrl.origin}/#website`,
         name: profile.fullName,
+        alternateName: [profile.name, siteUrl.hostname],
         url: siteUrl.origin,
         publisher: { "@id": `${siteUrl.origin}/#person` },
       }
