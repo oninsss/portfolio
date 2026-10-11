@@ -142,7 +142,7 @@ export function TechStack() {
       <div
         role="table"
         aria-label="Technologies by layer, and the projects and roles each one appears in"
-        className="max-w-[36rem] [--col:2.75rem] sm:[--col:5.5rem]"
+        className="max-w-[36rem] [--col:4rem] sm:[--col:5.5rem]"
       >
         <div role="rowgroup">
           <div role="row" className="grid" style={template}>
@@ -173,7 +173,6 @@ export function TechStack() {
                     onBlur={() => setHoveredId(null)}
                     className={[
                       "mx-auto block cursor-pointer whitespace-nowrap px-1 py-1.5 font-mono text-[0.625rem] uppercase leading-none tracking-[0.06em] transition-[color,opacity] duration-150 focus-visible:outline-offset-2",
-                      "[writing-mode:vertical-rl] rotate-180 sm:[writing-mode:horizontal-tb] sm:rotate-0",
                       isSelected
                         ? "text-accent"
                         : quiet
@@ -181,7 +180,16 @@ export function TechStack() {
                           : "text-ink-muted hover:text-ink",
                     ].join(" ")}
                   >
-                    {source.label}
+                    <span
+                      aria-hidden="true"
+                      className={[
+                        "flex h-9 w-9 items-center justify-center border text-[0.6875rem] tracking-[0.04em] transition-colors duration-150 sm:hidden",
+                        isSelected ? "border-accent" : "border-rule",
+                      ].join(" ")}
+                    >
+                      {source.mark}
+                    </span>
+                    <span className="sr-only sm:not-sr-only">{source.label}</span>
                   </button>
                 </div>
               );
@@ -229,6 +237,20 @@ export function TechStack() {
           />
         ))}
       </div>
+
+      <ul
+        aria-hidden="true"
+        className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs text-ink-muted sm:hidden"
+      >
+        {columns.map((source) => (
+          <li key={source.id} className="flex items-center gap-1.5">
+            <span className="flex h-5 w-5 items-center justify-center border border-rule font-mono text-[0.5625rem] uppercase">
+              {source.mark}
+            </span>
+            {source.label}
+          </li>
+        ))}
+      </ul>
 
       <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs leading-relaxed text-ink-muted">
         <span aria-hidden="true" className="inline-block h-2 w-2 bg-accent" />
