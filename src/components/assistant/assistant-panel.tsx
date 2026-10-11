@@ -59,6 +59,7 @@ const GAP_SIDE = 16;
 const GAP = 12;
 const GAP_ABOVE = 24;
 const TAIL_INSET = 18;
+const PRESS_SETTLE_MS = 600;
 
 type Side = "right" | "left" | "below" | "above";
 
@@ -186,7 +187,30 @@ export function AssistantPanel({
       handlers.current.onClose("outside");
     };
 
+    // Safari never focuses a link or button that is pressed, so focus leaves the
+    // panel with no related target the moment a finger or click lands on an
+    // option. That looks like an outside click and would close the menu before
+    // the option's click is delivered. Ignore focusout while a press that began
+    // inside the panel is still settling (iOS sends its mouse events after the
+    // finger lifts).
+    let pressing = false;
+    let settle: number | undefined;
+
+    const onPanelPointerDown = () => {
+      window.clearTimeout(settle);
+      pressing = true;
+    };
+
+    const onPointerRelease = () => {
+      if (!pressing) return;
+      window.clearTimeout(settle);
+      settle = window.setTimeout(() => {
+        pressing = false;
+      }, PRESS_SETTLE_MS);
+    };
+
     const onFocusOut = (event: FocusEvent) => {
+      if (pressing) return;
       const next = event.relatedTarget as Node | null;
       if (next && panel.contains(next)) return;
       if (next && triggerRef.current?.contains(next)) return;
@@ -195,11 +219,18 @@ export function AssistantPanel({
 
     document.addEventListener("keydown", onKey);
     document.addEventListener("pointerdown", onPointerDown);
+    document.addEventListener("pointerup", onPointerRelease);
+    document.addEventListener("pointercancel", onPointerRelease);
+    panel.addEventListener("pointerdown", onPanelPointerDown);
     panel.addEventListener("focusout", onFocusOut);
 
     return () => {
+      window.clearTimeout(settle);
       document.removeEventListener("keydown", onKey);
       document.removeEventListener("pointerdown", onPointerDown);
+      document.removeEventListener("pointerup", onPointerRelease);
+      document.removeEventListener("pointercancel", onPointerRelease);
+      panel.removeEventListener("pointerdown", onPanelPointerDown);
       panel.removeEventListener("focusout", onFocusOut);
     };
   }, [triggerRef, kind, autoFocus]);
