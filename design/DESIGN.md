@@ -113,8 +113,8 @@ with the relevant rows highlighted. No percentage bars, meters or logo walls.
 ## 9. Contact
 
 A short message form (name, email, message) beside a few direct rows: email,
-LinkedIn, GitHub. The email row offers Gmail, Outlook, the default mail app, or
-copying the address. The form validates on the server and says plainly when it
+LinkedIn, GitHub. The email row opens the default mail app, with a
+button beside it to copy the address. The form validates on the server and says plainly when it
 cannot send (§12).
 
 ---
