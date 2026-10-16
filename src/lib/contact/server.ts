@@ -34,6 +34,19 @@ export function oneLine(value: string, max: number): string {
     .slice(0, max);
 }
 
+export type Sender = { email: string; name?: string };
+
+// Accepts "Name <address>" or a bare address; returns null if it isn't valid.
+export function parseSender(value: string | undefined): Sender | null {
+  const raw = value?.trim();
+  if (!raw) return null;
+  const match = /^(.*)<([^<>]+)>$/.exec(raw);
+  const email = z.email().safeParse((match ? match[2] : raw).trim());
+  if (!email.success) return null;
+  const name = match ? oneLine(match[1].replace(/["']/g, ""), 80) : "";
+  return name ? { email: email.data, name } : { email: email.data };
+}
+
 const WINDOW_MS = 10 * 60_000;
 const MAX_TRACKED = 5_000;
 

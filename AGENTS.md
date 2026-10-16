@@ -56,7 +56,7 @@ Actual installed versions (see `package.json` / `package-lock.json`):
   `postcss.config.*`; the Tailwind loader is wired in `next.config.ts`)
 - npm (single package at the repository root — no monorepo, no `backend/`/`frontend/` split)
 - ESLint flat config (`eslint.config.mjs`) + `next typegen && tsc --noEmit` typechecking
-- Contact form: a Server Action (`src/app/actions.ts`) that validates with Zod and sends through the Resend REST API with `fetch` (no email SDK)
+- Contact form: a Server Action (`src/app/actions.ts`) that validates with Zod and sends through the Mailtrap REST API with `fetch` (no email SDK)
 - Playwright MCP for UI verification
 - **shadcn/ui: not installed (optional).** Do not install unless explicitly asked.
 - **Vitest: not installed (optional).** Do not install unless explicitly asked.
@@ -135,8 +135,8 @@ new design tokens or a second accent.
 - Never read or print `.env`, `.env.*`, or `secrets/**` unless the task
   explicitly and legitimately requires it.
 - Never commit secrets, tokens, keys, or credentials.
-- Server-only variables: `RESEND_API_KEY`, `CONTACT_TO_EMAIL`,
-  `CONTACT_FROM_EMAIL`, `CONTACT_PUBLIC_EMAIL`. They must never get a `NEXT_PUBLIC_` prefix, be logged,
+- Server-only variables: `MAILTRAP_API_KEY`, `MAILTRAP_INBOX_ID`,
+  `CONTACT_TO_EMAIL`, `CONTACT_FROM_EMAIL`, `CONTACT_PUBLIC_EMAIL`. They must never get a `NEXT_PUBLIC_` prefix, be logged,
   or reach a client component. `NEXT_PUBLIC_SITE_URL` (the public site address)
   is the only intentionally public variable. All are documented in `README.md`.
 - The developer's email address must never appear in source, in the rendered
