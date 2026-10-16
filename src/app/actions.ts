@@ -7,15 +7,17 @@ import {
   isLookupLimited,
   isRateLimited,
   oneLine,
+  parseSender,
 } from "@/lib/contact/server";
 import type { ContactState, ContactValues } from "@/lib/contact/limits";
 
-const RESEND_URL = "https://api.resend.com/emails";
+const MAILTRAP_URL = "https://send.api.mailtrap.io/api/send";
+const MAILTRAP_SANDBOX_URL = "https://sandbox.api.mailtrap.io/api/send";
 
 const TOO_FAST_MS = 2_500;
 
 const UNAVAILABLE =
-  "The form isn't available right now. Please use the email options above.";
+  "The form isn't available right now. Please use the email options below.";
 
 async function visitorKey(): Promise<string> {
   const requestHeaders = await headers();
@@ -82,26 +84,44 @@ export async function sendMessage(
 
   const { name, email, message } = parsed.data;
   const shownName = oneLine(name, 80);
-  const apiKey = process.env.RESEND_API_KEY;
-  const to = process.env.CONTACT_TO_EMAIL;
+  const apiKey = process.env.MAILTRAP_API_KEY?.trim();
+  const inboxId = process.env.MAILTRAP_INBOX_ID?.trim();
+  const to = z.email().safeParse(process.env.CONTACT_TO_EMAIL?.trim());
+  // A sandbox inbox accepts any sender; live sending needs a verified domain.
   const from =
-    process.env.CONTACT_FROM_EMAIL ?? "Portfolio <onboarding@resend.dev>";
+    parseSender(process.env.CONTACT_FROM_EMAIL) ??
+    (inboxId ? { email: "portfolio@example.com", name: "Portfolio" } : null);
 
-  if (!apiKey || !to) {
+  const inboxInvalid = Boolean(inboxId) && !/^\d+$/.test(inboxId!);
+
+  if (inboxId && !inboxInvalid && process.env.NODE_ENV === "production") {
+    console.warn(
+      "[contact] MAILTRAP_INBOX_ID is set in production; messages go to the sandbox inbox and are not delivered.",
+    );
+  }
+
+  if (!apiKey || !to.success || !from || inboxInvalid) {
     if (process.env.NODE_ENV === "production") {
       console.error(
-        "[contact] RESEND_API_KEY or CONTACT_TO_EMAIL is not set; message not sent.",
+        "[contact] MAILTRAP_API_KEY, CONTACT_TO_EMAIL, or CONTACT_FROM_EMAIL is missing or invalid; message not sent.",
       );
       return { status: "error", values, message: UNAVAILABLE };
     }
+    const problems = [
+      !apiKey && "MAILTRAP_API_KEY is not set",
+      !to.success && "CONTACT_TO_EMAIL is missing or not a valid email",
+      !from && "CONTACT_FROM_EMAIL is missing or invalid (required unless MAILTRAP_INBOX_ID is set)",
+      inboxInvalid && "MAILTRAP_INBOX_ID must be numeric",
+    ].filter(Boolean);
     console.info(
-      `[contact] development, not sent. From ${shownName} <${email}>:\n${message}`,
+      `[contact] development, not sent (${problems.join("; ")}). From ${shownName} <${email}>:\n${message}`,
     );
     return { status: "sent", name: shownName };
   }
 
   try {
-    const response = await fetch(RESEND_URL, {
+    const url = inboxId ? `${MAILTRAP_SANDBOX_URL}/${inboxId}` : MAILTRAP_URL;
+    const response = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -109,8 +129,9 @@ export async function sendMessage(
       },
       body: JSON.stringify({
         from,
-        to: [to],
-        reply_to: email,
+        to: [{ email: to.data }],
+        reply_to: { email, name: shownName },
+        category: "Portfolio contact form",
         subject: `Portfolio message from ${shownName}`,
         text: `From: ${shownName} <${email}>\n\n${message}\n\n(Sent from the contact form on the portfolio.)`,
       }),

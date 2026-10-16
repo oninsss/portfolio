@@ -43,13 +43,14 @@ Set these in your host's environment settings, never in the repository. Only `NE
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `RESEND_API_KEY` | for the contact form | API key from [Resend](https://resend.com/api-keys) |
+| `MAILTRAP_API_KEY` | for the contact form | API token from [Mailtrap](https://mailtrap.io/api-tokens). Use a Sending token for real delivery, or a Sandbox token together with `MAILTRAP_INBOX_ID` for testing |
+| `MAILTRAP_INBOX_ID` | no | Numeric ID of a Mailtrap Sandbox inbox. When set, messages are captured in that inbox instead of being delivered. Leave unset in production |
 | `CONTACT_TO_EMAIL` | for the contact form | Where contact-form messages are delivered |
 | `CONTACT_PUBLIC_EMAIL` | for the email links | The address visitors see and can write to. Use a dedicated address, such as a separate inbox for the portfolio, not your personal one. It is never in the repository, the HTML, or the JavaScript bundle: the server returns it on a visitor's first hover, focus, or touch. If unset, the email options say they are unavailable. |
-| `CONTACT_FROM_EMAIL` | no | Sender shown on messages, on a domain verified in Resend. Defaults to `Portfolio <onboarding@resend.dev>`, which only delivers to the Resend account owner's own email |
+| `CONTACT_FROM_EMAIL` | for live sending | Sender shown on messages, as `Portfolio <address@your-domain.com>` or a bare address, on a domain verified in Mailtrap. Optional with `MAILTRAP_INBOX_ID`, where any sender works |
 | `NEXT_PUBLIC_SITE_URL` | no | The site's public address, for example `https://your-domain.com`. Drives the canonical URL, social-share URLs, sitemap, and structured data. On Vercel, if unset, the production domain Vercel provides is used. If neither is available, those URL-dependent tags are left out. |
 
-Without `RESEND_API_KEY` and `CONTACT_TO_EMAIL`, the contact form tells visitors it is unavailable. Without `CONTACT_PUBLIC_EMAIL`, the email options say so, and LinkedIn and GitHub still work. Set `CONTACT_PUBLIC_EMAIL` before the first deploy.
+In production, without `MAILTRAP_API_KEY`, `CONTACT_TO_EMAIL`, and a valid sender, the contact form tells visitors it is unavailable. In development the message is logged to the server console instead. Without `CONTACT_PUBLIC_EMAIL`, the email options say so, and LinkedIn and GitHub still work. Set `CONTACT_PUBLIC_EMAIL` before the first deploy.
 
 For local development, create a `.env.local` file in the project root (it is git-ignored) with the same names and your own values. Keep real values out of any committed file.
 

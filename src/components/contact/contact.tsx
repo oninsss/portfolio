@@ -2,7 +2,7 @@ import type { ReactElement } from "react";
 import { contactLinks } from "@/content";
 import { IconArrowUpRight, IconGitHub, IconLinkedIn, IconMail } from "@/components/shared/icons";
 import { ContactForm } from "./contact-form";
-import { EmailMenu, MailtoLink } from "./protected-email";
+import { CopyEmail, MailtoLink } from "./protected-email";
 
 const CONTACT_ICONS: Record<
   string,
@@ -75,7 +75,7 @@ export function ContactInvitation() {
                   <MailtoLink className="group flex min-w-0 flex-1 items-center justify-between gap-5 py-5 sm:py-6">
                     {body}
                   </MailtoLink>
-                  <EmailMenu />
+                  <CopyEmail />
                 </div>
               ) : link.href ? (
                 <a
