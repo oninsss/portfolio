@@ -39,7 +39,7 @@ export type Project = {
   technologies: string[];
   links: SiteLink[];
   detail: ProjectDetail;
-  preview?: { src: string; alt: string };
+  preview?: { src: string; alt: string; width: number; height: number };
 };
 
 export type SkillGroup = {

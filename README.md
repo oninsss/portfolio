@@ -1,6 +1,6 @@
 # Portfolio
 
-A one-page portfolio for onins (Antoniño Bonagua), Full Stack Developer: a modern résumé redesigned as a website, with light, dark and system themes, an interactive guide robot, and a contact form.
+A one-page portfolio for onins (Antoniño Bonagua), Full Stack Developer: a modern résumé redesigned as a website, with light, dark and system themes, an interactive pixel-art guide, and a contact form.
 
 Built with Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4. Design notes are in [`design/DESIGN.md`](design/DESIGN.md) and the working rules are in [`AGENTS.md`](AGENTS.md).
 
