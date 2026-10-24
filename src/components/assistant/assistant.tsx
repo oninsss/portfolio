@@ -8,15 +8,15 @@ import {
   type PanelCloseReason,
 } from "./assistant-panel";
 import { GUIDE_EVENT } from "@/components/layout/back-to-top";
-import { RobotParts, type Face } from "./robot";
+import { RobotParts, type Act, type Face } from "./robot";
 import { BOOT_EVENT } from "@/lib/assistant/boot";
+import { REVISIT, linesFor, type Line } from "@/lib/assistant/guide-script";
 import {
-  HELP_QUIPS,
-  HOME_QUIPS,
-  REVISIT,
-  linesFor,
-  type Line,
-} from "@/lib/assistant/guide-script";
+  RESUME_QUIP,
+  THEME_QUIPS,
+  nextQuip,
+  type Quip,
+} from "@/lib/assistant/quips";
 import {
   clamp,
   glide,
@@ -39,7 +39,11 @@ const READ_MIN_MS = 2400;
 const READ_MAX_MS = 5200;
 
 const QUIP_EVERY_MS = 15000;
+const QUIP_SPREAD_MS = 9000;
 const QUIP_RETRY_MS = 2500;
+const REACT_COOLDOWN_MS = 12000;
+
+const ACT_MS: Record<Act, number> = { wave: 1700, dance: 2700 };
 
 const BLINK_EVERY_MIN_MS = 2800;
 const BLINK_EVERY_SPREAD_MS = 3400;
@@ -193,8 +197,8 @@ export function AssistantCube({ className }: AssistantCubeProps) {
   const ackToken = useRef(0);
   const sayToken = useRef(0);
   const sayCount = useRef(0);
-  const homeQuip = useRef(0);
-  const helpQuip = useRef(0);
+  const actTimer = useRef<number | undefined>(undefined);
+  const lastReact = useRef(0);
   const hoverTimer = useRef<number | undefined>(undefined);
   const runToken = useRef(0);
   const journeyTimers = useRef<number[]>([]);
@@ -246,6 +250,33 @@ export function AssistantCube({ className }: AssistantCubeProps) {
     sayToken.current += 1;
     setSay(null);
   }, []);
+
+  const playAct = useCallback((act: Act) => {
+    const el = triggerRef.current;
+    if (!el || reduced() || el.hasAttribute("data-journey")) return;
+    window.clearTimeout(actTimer.current);
+    el.setAttribute("data-act", act);
+    actTimer.current = window.setTimeout(() => {
+      el.removeAttribute("data-act");
+    }, ACT_MS[act]);
+  }, []);
+
+  const tell = useCallback(
+    (remark: Quip) => {
+      speakLines([{ text: remark.text, face: remark.face }]);
+      if (remark.act) playAct(remark.act);
+    },
+    [speakLines, playAct],
+  );
+
+  /** A small gesture the first time the guide reaches the contact section or the end of the page. */
+  const celebrate = useCallback(
+    (id: string) => {
+      if (id === "contact") playAct("wave");
+      else if (id === "footer") playAct("dance");
+    },
+    [playAct],
+  );
 
   const clearHover = useCallback(() => {
     if (hoverTimer.current === undefined) return;
@@ -356,9 +387,10 @@ export function AssistantCube({ className }: AssistantCubeProps) {
         const first = !visited.current.has(id);
         visited.current.add(id);
         speakLines(first ? linesFor(id, "hop") : REVISIT);
+        if (first) celebrate(id);
       });
     },
-    [flyTo, hush, park, settleHome, speakLines],
+    [flyTo, hush, park, settleHome, speakLines, celebrate],
   );
 
   useEffect(() => {
@@ -369,6 +401,7 @@ export function AssistantCube({ className }: AssistantCubeProps) {
       setReady(true);
       if (booted) {
         hop(triggerRef.current);
+        playAct("wave");
         speakLines(GREETING);
       } else {
         after(CHECK_DELAY_MS, () => speakLines(CHECK_ME));
@@ -387,7 +420,14 @@ export function AssistantCube({ className }: AssistantCubeProps) {
       pending.forEach((id) => window.clearTimeout(id));
       pending.clear();
     };
-  }, [after, speakLines]);
+  }, [after, speakLines, playAct]);
+
+  useEffect(
+    () => () => {
+      window.clearTimeout(actTimer.current);
+    },
+    [],
+  );
 
   useEffect(() => cancelJourney, [cancelJourney]);
 
@@ -489,17 +529,49 @@ export function AssistantCube({ className }: AssistantCubeProps) {
         schedule(QUIP_RETRY_MS);
         return;
       }
-      const away = postRef.current !== "home";
-      const pool = away ? HELP_QUIPS : HOME_QUIPS;
-      const index = away ? helpQuip : homeQuip;
-      speakLines([pool[index.current % pool.length]]);
-      index.current += 1;
-      schedule(QUIP_EVERY_MS);
+      const remark = nextQuip(postRef.current);
+      if (remark) tell(remark);
+      schedule(QUIP_EVERY_MS + Math.random() * QUIP_SPREAD_MS);
     }
 
-    schedule(QUIP_EVERY_MS);
+    schedule(QUIP_EVERY_MS + Math.random() * QUIP_SPREAD_MS);
     return () => window.clearTimeout(id);
-  }, [ready, speakLines]);
+  }, [ready, tell]);
+
+  useEffect(() => {
+    if (!ready) return;
+
+    const react = (remarks: Quip[]) => {
+      const now = Date.now();
+      if (busy.current || now - lastReact.current < REACT_COOLDOWN_MS) return;
+      lastReact.current = now;
+      tell(remarks[Math.floor(Math.random() * remarks.length)]);
+    };
+
+    let theme = document.documentElement.dataset.theme ?? "system";
+    const observer = new MutationObserver(() => {
+      const next = document.documentElement.dataset.theme ?? "system";
+      if (next === theme) return;
+      theme = next;
+      const pool = next === "dark" || next === "light" ? THEME_QUIPS[next] : THEME_QUIPS.system;
+      react(pool);
+    });
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-theme"],
+    });
+
+    const onClick = (event: MouseEvent) => {
+      const link = (event.target as Element | null)?.closest("a[download]");
+      if (link) react([RESUME_QUIP]);
+    };
+    document.addEventListener("click", onClick);
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("click", onClick);
+    };
+  }, [ready, tell]);
 
   useEffect(() => {
     if (!ready) return;
@@ -643,12 +715,16 @@ export function AssistantCube({ className }: AssistantCubeProps) {
         }
         anchor.focus({ preventScroll: true });
       }
+      const firstVisit = !visited.current.has(id);
       visited.current.add(id);
 
       later(ARRIVE_MS, () => {
         if (!alive()) return;
         if (quiet) speakLines([{ text: "Back at the top.", face: "happy" }]);
-        else speakLines(linesFor(id, "tour"), true);
+        else {
+          speakLines(linesFor(id, "tour"), true);
+          if (firstVisit) celebrate(id);
+        }
       });
     };
 
