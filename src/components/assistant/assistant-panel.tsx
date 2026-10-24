@@ -10,6 +10,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import type { Face } from "./robot";
+import { IconArrowUpRight } from "@/components/shared/icons";
+import { heroLinks } from "@/content";
 import { OPENINGS } from "@/lib/assistant/guide-script";
 import { clamp } from "@/lib/assistant/journey";
 
@@ -53,6 +55,8 @@ export const DESTINATIONS: Destination[] = [
     face: OPENINGS.contact.face,
   },
 ];
+
+const linkedin = heroLinks.find((link) => link.label === "LinkedIn")?.href;
 
 const MARGIN = 12;
 const GAP_SIDE = 16;
@@ -280,6 +284,22 @@ export function AssistantPanel({
               </a>
             </li>
           ))}
+          {linkedin ? (
+            <li>
+              <a
+                href={linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-2 py-3 text-sm text-ink transition-colors duration-150 hover:text-accent focus-visible:outline-offset-2"
+              >
+                <span>
+                  Connect on LinkedIn
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </span>
+                <IconArrowUpRight size={13} />
+              </a>
+            </li>
+          ) : null}
         </ul>
       </div>
     ) : (

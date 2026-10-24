@@ -183,19 +183,3 @@ export function linesFor(id: string, mode: "tour" | "hop"): Line[] {
 }
 
 export const REVISIT: Line[] = [ASK_AFTER_HOP];
-
-export const HOME_QUIPS: Line[] = [
-  line("Psst. Poke me for a quick tour.", "wink"),
-  line("Fun fact: I'm made entirely of CSS.", "happy"),
-  line("Not sure where to start? Ask me.", "smile"),
-  line("The projects are a good place to start.", "wow"),
-  line("Beep boop. I only know this one page, but I know it well.", "think"),
-  line("I can take you anywhere on this page.", "happy"),
-];
-
-export const HELP_QUIPS: Line[] = [
-  line("Need anything? Poke me and I'll show you around.", "happy"),
-  line("Looking for something in particular?", "think"),
-  line("Want to jump somewhere else? Just ask.", "wink"),
-  line("I can take you back to the top, or anywhere in between.", "smile"),
-];
