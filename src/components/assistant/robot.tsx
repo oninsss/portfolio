@@ -1,26 +1,83 @@
-export type Face =
-  | "name"
-  | "sleep"
-  | "smile"
-  | "happy"
-  | "wink"
-  | "wow"
-  | "think";
+import {
+  ARMS,
+  BLINK,
+  BODY_PATHS,
+  GRID,
+  POSES,
+  TALK,
+  pathOf,
+  type PoseName,
+} from "./sprite";
 
+export type Face = PoseName;
+
+/** A short gesture played on top of the current face. */
+export type Act = "wave" | "dance";
+
+const FACES = Object.keys(POSES) as Face[];
+
+const poseParts = FACES.map((face) => ({
+  face,
+  eyes: pathOf(POSES[face].eyes),
+  mouth: pathOf(POSES[face].mouth),
+  extra: pathOf(POSES[face].extra ?? []),
+}));
+
+const parts = {
+  blink: pathOf(BLINK),
+  talk: pathOf(TALK),
+  restLeft: pathOf(ARMS.restLeft),
+  restRight: pathOf(ARMS.restRight),
+  upLeft: pathOf(ARMS.upLeft),
+  upRight: pathOf(ARMS.upRight),
+  highRight: pathOf(ARMS.highRight),
+};
+
+/**
+ * The guide: a small pixel-art cube with a visor face. The face (`data-face`),
+ * blink, talk and gestures (`data-act`) are all driven from globals.css by
+ * attributes on the parent `.bot`, so React never re-renders to animate it.
+ */
 export function RobotParts({ label }: { label?: string }) {
   return (
     <span className="bot-parts" aria-hidden="true">
-      <i className="bot-antenna" />
-      <i className="bot-ear bot-ear-l" />
-      <i className="bot-ear bot-ear-r" />
-      <span className="bot-visor">
-        <span className="bot-eyes">
-          <i className="bot-eye" />
-          <i className="bot-eye" />
-        </span>
-        <span className="bot-mouth" />
-        {label ? <span className="bot-label">{label}</span> : null}
-      </span>
+      <svg
+        className="bot-sprite"
+        viewBox={`0 0 ${GRID} ${GRID}`}
+        focusable="false"
+      >
+        <g data-part="all">
+          <path data-part="bulb" className="px-a" d={BODY_PATHS.A} />
+          <path className="px-s" d={BODY_PATHS.S} />
+          <path className="px-b" d={BODY_PATHS.B} />
+          <path className="px-l" d={BODY_PATHS.L} />
+          <path className="px-d" d={BODY_PATHS.D} />
+
+          <path data-part="arm-rest-l" className="px-s" d={parts.restLeft} />
+          <path data-part="arm-rest-r" className="px-s" d={parts.restRight} />
+          <path data-part="arm-up-l" className="px-s" d={parts.upLeft} />
+          <path data-part="arm-up-r" className="px-s" d={parts.upRight} />
+          <path data-part="arm-high-r" className="px-s" d={parts.highRight} />
+
+          {poseParts.map(({ face, eyes, mouth, extra }) => (
+            <g key={face} data-pose={face}>
+              <path data-part="eyes" className="px-w" d={eyes} />
+              <path data-part="mouth" className="px-w" d={mouth} />
+              {extra ? (
+                <path
+                  data-part="extra"
+                  className={face === "sleep" ? "px-a" : "px-w"}
+                  d={extra}
+                />
+              ) : null}
+            </g>
+          ))}
+
+          <path data-part="blink" className="px-w" d={parts.blink} />
+          <path data-part="talk" className="px-w" d={parts.talk} />
+        </g>
+      </svg>
+      {label ? <span className="bot-label">{label}</span> : null}
     </span>
   );
 }
