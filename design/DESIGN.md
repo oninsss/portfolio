@@ -41,7 +41,7 @@ the right. On narrow screens the label stacks above the content.
 ## 3. Introduction
 
 - Photo on the left (portrait, rounded, hairline border, gently zoomed), name as
-  the `h1` with the robot mark beside it, role underneath.
+  the `h1` with the guide beside it, role underneath.
 - Fact chips: background, location, local time there (with the UTC offset and a
   24-hour day bar), and availability. Each appears only if it has a value.
 - A rotating lead sentence (five lines, each held for several seconds) with
@@ -122,7 +122,7 @@ cannot send (§12).
 ## 10. Footer
 
 Copyright with the current year, a "Built with …" line linking into the Tech
-Stack, the contact icons, and **Back to top** (which the robot performs, §14).
+Stack, the contact icons, and **Back to top** (which the guide performs, §14).
 
 ---
 
@@ -135,7 +135,7 @@ spacing, subtle borders, clear hierarchy.
   markers, the navigation rail, the stack line, the tech matrix.
 - **Hairline rules** (`--rule`) instead of boxes. Cards are used only for
   credentials; they are plain bordered rectangles.
-- **Rounded corners** are reserved for the photo, the robot, and the credential
+- **Rounded corners** are reserved for the photo and the credential
   badges.
 - **Mono** is used only for technical metadata: labels, dates, counts.
 - The page reads correctly with all animation disabled.
@@ -181,25 +181,40 @@ reduced-motion page is complete, not degraded.
 
 ---
 
-## 14. Signature interaction: the robot
+## 14. Signature interaction: the guide
 
-The geometric shape that begins the page becomes a small robot: a purple rounded
-square with a dark visor and a changing face. It lives in the hero beside the name.
+The geometric shape that begins the page becomes a small guide: a pixel-art cube
+(a 14 by 14 grid, drawn in the accent) with a dark visor and a changing face, and
+two feet. It lives in the hero beside the name. It is the one place the site uses
+pixel art, which echoes the square marks used elsewhere (§11); it is drawn as
+inline SVG from `components/assistant/sprite.ts`, so it is crisp at any size and
+takes its colours from the theme tokens. The favicon, the touch icon and the share
+image are the same sprite.
 
-- **First visit in a session:** a short boot screen shows the robot asleep with the
-  name on its visor, wakes it, and sends it to its place beside the name. Later
-  loads skip this, as does reduced motion.
+- **First visit in a session:** a short boot screen shows the guide asleep with the
+  name on its visor, wakes it, and sends it to its place beside the name. It waves
+  when it lands. Later loads skip this, as does reduced motion.
 - **Click or hover** opens a small menu: Know me, See my work, My experience,
-  Let's talk. Choosing one scrolls and moves the robot to that section, where it
-  says something short.
+  Let's talk, and a **Connect on LinkedIn** link that opens in a new tab. Choosing
+  one of the first four scrolls and moves the guide to that section, where it says
+  something short.
 - **Everything it says is generated from the page's own data**, so it cannot claim
-  anything the page does not show.
+  anything the page does not show. It holds no hand-written facts about the owner.
 - **Page-anchored:** it moves in page coordinates and stays where it parked when
   you scroll; it never follows the window.
 - **Back to top** sends it home with the scroll.
-- **Idle:** it blinks and, occasionally, says something. Reading a section can
-  prompt a remark.
-- **Reduced motion:** it jumps instead of flying.
+- **Idle:** it blinks and, every 15 to 24 seconds, says something. Remarks come from
+  the section it is standing in plus a shared pool (clock in the owner's time zone,
+  how to use the page, the stack the site is built with). A remark is not repeated
+  until every remark available there has been said, and what has been said is
+  remembered for the session (`sessionStorage`), so a reload does not start the
+  list over.
+- **Reactions:** it comments, at most once every 12 seconds, when the theme changes
+  or the résumé is downloaded.
+- **Gestures:** it waves on greeting and on reaching the contact section, and
+  dances on reaching the footer, on the résumé download, and with a few remarks. A
+  gesture lasts under three seconds and is stepped, not eased, to stay pixel-true.
+- **Reduced motion:** it jumps instead of flying, and does not blink or gesture.
 - **Keyboard:** reachable by Tab, opens with Enter, closes with Escape and returns
   focus. It is a button with a name ("Portfolio guide").
 
@@ -238,7 +253,7 @@ Decisions that are in place but not final:
 - **Résumé** download serves `public/Bonagua_Antonino_Resume-Public.pdf`, a temporary version (it still contains a `[Portfolio URL]` placeholder) to be replaced under the same filename.
 - **Name:** the visible name is "onins"; metadata uses "Antoniño Bonagua".
 - **Hero lead lines** are drafts for the developer to edit.
-- **Share image** is generated from the robot, name and role; a different one can
+- **Share image** is generated from the guide sprite, name and role; a different one can
   replace it.
 
 Built but not shown: a GitHub contribution calendar
@@ -261,3 +276,11 @@ No dashboard, terminal UI, futuristic aesthetic, template look, card walls,
 gradients, glassmorphism, cursor-following, fake metrics, skill bars, technology
 logo walls, shadcn requirement, unnecessary dependencies, or animation for its
 own sake.
+
+---
+
+## 20. Later
+
+- **Personal facts for the guide:** a small content file of true one-liners about the
+  owner (interests, what they are learning, preferences) that the guide can draw
+  from. Until the owner supplies them, the guide uses only what the page shows.
