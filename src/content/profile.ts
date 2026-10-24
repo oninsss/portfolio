@@ -68,8 +68,8 @@ export const portrait:
       focus?: string;
     }
   | undefined = {
-  light: "/profile/portrait-light.webp",
-  dark: "/profile/portrait-dark-v2.webp",
+  light: "/profile/portrait-light-hq.webp",
+  dark: "/profile/portrait-dark-hq.webp",
   alt: "Portrait of onins",
   zoom: 1,
   focus: "50% 0%",

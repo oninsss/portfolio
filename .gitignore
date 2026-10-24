@@ -40,3 +40,6 @@ Thumbs.db
 
 # NOTE: AGENTS.md, CLAUDE.md, docs/, and design/ are project documentation
 # and are intentionally NOT ignored.
+
+# Heavy original images (kept locally, not served or committed)
+design/source/
