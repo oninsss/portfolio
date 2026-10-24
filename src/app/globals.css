@@ -80,27 +80,27 @@ body {
 }
 
 .bot {
-  --s: 2.5rem;
+  --s: 2.625rem;
   --bot-body: var(--accent);
+  --bot-hi: color-mix(in oklab, var(--accent) 70%, #fff);
   --bot-shade: color-mix(in oklab, var(--accent) 76%, #000);
   --bot-visor: color-mix(in oklab, var(--accent) 40%, #0a0a09);
+  --bot-bulb: color-mix(in oklab, var(--accent) 55%, #fff);
   --bot-eye: #f8f8f6;
   position: relative;
   display: block;
   flex: none;
   width: var(--s);
   height: var(--s);
-  border-radius: calc(var(--s) * 0.34);
-  background: var(--bot-body);
 }
 
 .bot-hero {
-  --s: 2.5rem;
+  --s: 2.625rem;
 }
 
 @media (min-width: 640px) {
   .bot-hero {
-    --s: 2.75rem;
+    --s: 3.5rem;
   }
 }
 
@@ -108,197 +108,77 @@ body {
   display: contents;
 }
 
-.bot-antenna {
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% - 1px);
-  width: calc(var(--s) * 0.055);
-  height: calc(var(--s) * 0.17);
-  margin-left: calc(var(--s) * -0.0275);
-  border-radius: 99px;
-  background: var(--bot-shade);
-  transform-origin: 50% 100%;
-  transition: transform var(--dur-2) var(--ease);
-}
-
-.bot-antenna::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: calc(var(--s) * -0.1);
-  width: calc(var(--s) * 0.14);
-  height: calc(var(--s) * 0.14);
-  margin-left: calc(var(--s) * -0.07);
-  border-radius: 50%;
-  background: var(--bot-body);
-}
-
-.bot-ear {
-  position: absolute;
-  top: 50%;
-  width: calc(var(--s) * 0.1);
-  height: calc(var(--s) * 0.28);
-  margin-top: calc(var(--s) * -0.14);
-  background: var(--bot-shade);
-}
-
-.bot-ear-l {
-  left: calc(var(--s) * -0.07);
-  border-radius: calc(var(--s) * 0.07) 0 0 calc(var(--s) * 0.07);
-}
-
-.bot-ear-r {
-  right: calc(var(--s) * -0.07);
-  border-radius: 0 calc(var(--s) * 0.07) calc(var(--s) * 0.07) 0;
-}
-
-.bot-visor {
-  position: absolute;
-  inset: calc(var(--s) * 0.12);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: calc(var(--s) * 0.065);
-  border-radius: calc(var(--s) * 0.24);
-  background: var(--bot-visor);
-}
-
-.bot-visor::before,
-.bot-visor::after {
-  content: "";
-  position: absolute;
-  bottom: calc(var(--s) * 0.085);
-  width: calc(var(--s) * 0.1);
-  height: calc(var(--s) * 0.055);
-  border-radius: 99px;
-  background: var(--bot-eye);
-  opacity: 0;
-  transition: opacity var(--dur-2) var(--ease);
-}
-
-.bot-visor::before {
-  left: calc(var(--s) * 0.06);
-}
-
-.bot-visor::after {
-  right: calc(var(--s) * 0.06);
-}
-
-.bot[data-face="happy"] .bot-visor::before,
-.bot[data-face="happy"] .bot-visor::after,
-.bot[data-face="wink"] .bot-visor::before,
-.bot[data-face="wink"] .bot-visor::after {
-  opacity: 0.28;
-}
-
-.bot-eyes {
-  display: flex;
-  align-items: center;
-  gap: calc(var(--s) * 0.17);
-  height: calc(var(--s) * 0.2);
-}
-
-.bot-eye {
+/* The sprite is a 14 x 14 pixel grid; sizes above are multiples of 14px so each
+   pixel lands on whole device pixels at 1x and 2x. */
+.bot-sprite {
   display: block;
-  width: calc(var(--s) * 0.12);
-  height: calc(var(--s) * 0.19);
-  border: 0 solid var(--bot-eye);
-  border-radius: 99px;
-  background: var(--bot-eye);
-  transition:
-    width 140ms var(--ease),
-    height 140ms var(--ease),
-    border-width 140ms var(--ease),
-    background-color 140ms var(--ease),
-    transform 140ms var(--ease);
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  shape-rendering: crispEdges;
 }
 
-.bot-mouth {
-  width: calc(var(--s) * 0.22);
-  height: calc(var(--s) * 0.1);
-  border: 0 solid var(--bot-eye);
-  border-bottom-width: calc(var(--s) * 0.04);
-  border-radius: 0 0 99px 99px;
-  background: transparent;
-  transition:
-    width 140ms var(--ease),
-    height 140ms var(--ease),
-    border-bottom-width 140ms var(--ease),
-    background-color 140ms var(--ease),
-    transform 140ms var(--ease),
-    opacity 200ms var(--ease);
+.px-b {
+  fill: var(--bot-body);
 }
 
-.bot[data-face="sleep"] .bot-eye {
-  width: calc(var(--s) * 0.14);
-  height: calc(var(--s) * 0.035);
+.px-l {
+  fill: var(--bot-hi);
 }
 
-.bot[data-face="sleep"] .bot-mouth {
-  width: calc(var(--s) * 0.1);
-  height: 0;
-  border-bottom-width: calc(var(--s) * 0.035);
-  border-radius: 99px;
+.px-s {
+  fill: var(--bot-shade);
 }
 
-.bot[data-face="happy"] .bot-eye {
-  width: calc(var(--s) * 0.16);
-  height: calc(var(--s) * 0.09);
-  border-top-width: calc(var(--s) * 0.045);
-  border-radius: 99px 99px 0 0;
-  background: transparent;
+.px-d {
+  fill: var(--bot-visor);
 }
 
-.bot[data-face="happy"] .bot-mouth,
-.bot[data-face="wink"] .bot-mouth {
-  width: calc(var(--s) * 0.3);
-  height: calc(var(--s) * 0.15);
-  border-bottom-width: 0;
-  background: var(--bot-eye);
+.px-a {
+  fill: var(--bot-bulb);
 }
 
-.bot[data-face="wink"] .bot-eye:last-child {
-  width: calc(var(--s) * 0.16);
-  height: calc(var(--s) * 0.035);
+.px-w {
+  fill: var(--bot-eye);
 }
 
-.bot[data-face="wow"] .bot-eye {
-  width: calc(var(--s) * 0.15);
-  height: calc(var(--s) * 0.15);
+/* Faces: only the current pose is drawn. */
+.bot [data-pose],
+.bot [data-part="blink"],
+.bot [data-part="talk"],
+.bot [data-part="arm-up-l"],
+.bot [data-part="arm-up-r"],
+.bot [data-part="arm-high-r"] {
+  display: none;
 }
 
-.bot[data-face="wow"] .bot-mouth {
-  width: calc(var(--s) * 0.12);
-  height: calc(var(--s) * 0.14);
-  border-bottom-width: 0;
-  border-radius: 99px;
-  background: var(--bot-eye);
+.bot:not([data-face]) [data-pose="smile"] {
+  display: inline;
 }
 
-.bot[data-face="think"] .bot-eye {
-  transform: translate(calc(var(--s) * 0.045), calc(var(--s) * -0.04));
-}
-
-.bot[data-face="think"] .bot-mouth {
-  width: calc(var(--s) * 0.15);
-  height: 0;
-  border-radius: 99px;
-  transform: translateX(calc(var(--s) * 0.06));
+.bot[data-face="smile"] [data-pose="smile"],
+.bot[data-face="happy"] [data-pose="happy"],
+.bot[data-face="wink"] [data-pose="wink"],
+.bot[data-face="wow"] [data-pose="wow"],
+.bot[data-face="think"] [data-pose="think"],
+.bot[data-face="sleep"] [data-pose="sleep"],
+.bot[data-face="name"] [data-pose="name"] {
+  display: inline;
 }
 
 .bot-label {
   position: absolute;
-  inset: 0;
+  left: calc(100% * 2 / 14);
+  right: calc(100% * 2 / 14);
+  top: calc(100% * 3 / 14);
+  height: calc(100% * 7 / 14);
   display: grid;
   place-items: center;
   font-family: var(--font-sans);
-  font-size: calc(var(--s) * 0.145);
+  font-size: calc(var(--s) * 0.15);
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--bot-eye);
-  text-shadow: 0 0 calc(var(--s) * 0.06)
-    color-mix(in oklab, var(--bot-eye) 55%, transparent);
   opacity: 0;
   transition: opacity 260ms var(--ease);
   pointer-events: none;
@@ -309,17 +189,6 @@ body {
   animation: bot-label-in 600ms var(--ease) backwards;
 }
 
-.bot[data-face="name"] .bot-eyes,
-.bot[data-face="name"] .bot-mouth,
-.bot[data-face="name"] .bot-visor::before,
-.bot[data-face="name"] .bot-visor::after {
-  opacity: 0;
-}
-
-.bot-eyes {
-  transition: opacity 200ms var(--ease);
-}
-
 @keyframes bot-label-in {
   from {
     opacity: 0;
@@ -327,24 +196,130 @@ body {
   }
 }
 
-.bot[data-blink]:not([data-face="happy"]) .bot-eye {
-  transform: scaleY(0.12);
+/* A blink swaps the eyes for a one-pixel line. Happy and sleeping eyes are
+   already closed, and the thinking eyes sit a pixel off-centre, so they skip it. */
+.bot[data-blink]:not([data-face="happy"]):not([data-face="sleep"]):not([data-face="think"]):not([data-face="name"])
+  [data-part="eyes"] {
+  display: none;
 }
 
-.bot[data-talk] .bot-mouth {
-  transform-origin: 50% 0;
-  animation: bot-talk 240ms ease-in-out 5;
+.bot[data-blink]:not([data-face="happy"]):not([data-face="sleep"]):not([data-face="think"]):not([data-face="name"])
+  [data-part="blink"] {
+  display: inline;
 }
 
-@keyframes bot-talk {
-  50% {
-    transform: scaleY(1.7);
+/* Hover tilts the bulb one pixel. */
+.mark-hero:hover:not(:disabled) [data-part="bulb"],
+.mark-hero:focus-visible [data-part="bulb"] {
+  transform: translateX(1px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* Talking swaps the mouth between two frames. */
+  .bot[data-talk]:not([data-face="name"]) [data-part="mouth"] {
+    animation: bot-talk-a 240ms step-end 5;
   }
-}
 
-.mark-hero:hover:not(:disabled) .bot-antenna,
-.mark-hero:focus-visible .bot-antenna {
-  transform: rotate(14deg);
+  .bot[data-talk]:not([data-face="name"]) [data-part="talk"] {
+    display: inline;
+    opacity: 0;
+    animation: bot-talk-b 240ms step-end 5;
+  }
+
+  @keyframes bot-talk-a {
+    0% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes bot-talk-b {
+    0% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  /* Gestures, set from script for a moment. */
+  .bot[data-act="wave"] [data-part="arm-rest-r"] {
+    display: none;
+  }
+
+  .bot[data-act="wave"] [data-part="arm-up-r"] {
+    display: inline;
+    animation: bot-talk-a 520ms step-end 3;
+  }
+
+  .bot[data-act="wave"] [data-part="arm-high-r"] {
+    display: inline;
+    opacity: 0;
+    animation: bot-talk-b 520ms step-end 3;
+  }
+
+  .bot[data-act="dance"] [data-part="all"] {
+    animation: bot-bounce 640ms step-end 4;
+  }
+
+  .bot[data-act="dance"] [data-part="arm-rest-l"],
+  .bot[data-act="dance"] [data-part="arm-rest-r"] {
+    animation: bot-arms-rest 640ms step-end 4;
+  }
+
+  .bot[data-act="dance"] [data-part="arm-up-l"],
+  .bot[data-act="dance"] [data-part="arm-up-r"] {
+    display: inline;
+    opacity: 0;
+    animation: bot-arms-up 640ms step-end 4;
+  }
+
+  @keyframes bot-bounce {
+    0% {
+      transform: translateY(0);
+    }
+    25% {
+      transform: translateY(-1px);
+    }
+    50% {
+      transform: translateY(0);
+    }
+    75% {
+      transform: translateY(-1px);
+    }
+  }
+
+  @keyframes bot-arms-rest {
+    0% {
+      opacity: 1;
+    }
+    25% {
+      opacity: 0;
+    }
+    50% {
+      opacity: 1;
+    }
+    75% {
+      opacity: 0;
+    }
+  }
+
+  @keyframes bot-arms-up {
+    0% {
+      opacity: 0;
+    }
+    25% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+    75% {
+      opacity: 1;
+    }
+  }
 }
 
 @keyframes mark-settle {
@@ -419,15 +394,15 @@ html[data-opener="run"] .boot {
 }
 
 .boot .bot {
-  --s: 6.5rem;
+  --s: 7rem;
 }
 
 .boot .bot:not([data-awake]) {
-  animation: boot-bob 1.8s ease-in-out infinite;
+  animation: boot-bob 1.8s step-end infinite;
 }
 
-.boot .bot:not([data-awake]) .bot-antenna::after {
-  animation: boot-ping 1s ease-in-out infinite;
+.boot .bot:not([data-awake]) [data-part="bulb"] {
+  animation: boot-ping 1s step-end infinite;
 }
 
 .boot .bot[data-awake] {
@@ -436,14 +411,13 @@ html[data-opener="run"] .boot {
 
 @keyframes boot-bob {
   50% {
-    transform: translateY(-0.35rem);
+    transform: translateY(-0.5rem);
   }
 }
 
 @keyframes boot-ping {
   50% {
-    transform: scale(1.5);
-    opacity: 0.5;
+    opacity: 0.25;
   }
 }
 
