@@ -26,11 +26,20 @@ const poseParts = FACES.map((face) => ({
 const parts = {
   blink: pathOf(BLINK),
   talk: pathOf(TALK),
-  restLeft: pathOf(ARMS.restLeft),
-  restRight: pathOf(ARMS.restRight),
-  upLeft: pathOf(ARMS.upLeft),
-  upRight: pathOf(ARMS.upRight),
-  highRight: pathOf(ARMS.highRight),
+};
+
+const limbs = (Object.keys(ARMS) as (keyof typeof ARMS)[]).map((name) => ({
+  name,
+  arm: pathOf(ARMS[name].arm),
+  hand: pathOf(ARMS[name].hand),
+}));
+
+const PART: Record<keyof typeof ARMS, string> = {
+  restLeft: "arm-rest-l",
+  restRight: "arm-rest-r",
+  upLeft: "arm-up-l",
+  upRight: "arm-up-r",
+  highRight: "arm-high-r",
 };
 
 /**
@@ -53,11 +62,12 @@ export function RobotParts({ label }: { label?: string }) {
           <path className="px-l" d={BODY_PATHS.L} />
           <path className="px-d" d={BODY_PATHS.D} />
 
-          <path data-part="arm-rest-l" className="px-s" d={parts.restLeft} />
-          <path data-part="arm-rest-r" className="px-s" d={parts.restRight} />
-          <path data-part="arm-up-l" className="px-s" d={parts.upLeft} />
-          <path data-part="arm-up-r" className="px-s" d={parts.upRight} />
-          <path data-part="arm-high-r" className="px-s" d={parts.highRight} />
+          {limbs.map(({ name, arm, hand }) => (
+            <g key={name} data-part={PART[name]}>
+              <path className="px-s" d={arm} />
+              <path className="px-l" d={hand} />
+            </g>
+          ))}
 
           {poseParts.map(({ face, eyes, mouth, extra }) => (
             <g key={face} data-pose={face}>
