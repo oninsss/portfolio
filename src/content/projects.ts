@@ -17,7 +17,7 @@ export const projects: Project[] = [
       "OpenAI / GPT-4o",
       "AWS EC2",
     ],
-    links: [],
+    links: [{ label: "Live demo", href: "https://aikonsulta.onins.dev" }],
     preview: {
       src: "/projects/aikonsulta.webp",
       alt: "The AI-Konsulta home page: the headline “Simplifying Your Clinic Visit Experience”, Get Started and Download the App buttons, a friendly robot mascot, and a chat assistant offering help in the corner.",
