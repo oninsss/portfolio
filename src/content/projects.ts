@@ -18,6 +18,12 @@ export const projects: Project[] = [
       "AWS EC2",
     ],
     links: [],
+    preview: {
+      src: "/projects/aikonsulta.webp",
+      alt: "The AI-Konsulta home page: the headline “Simplifying Your Clinic Visit Experience”, Get Started and Download the App buttons, a friendly robot mascot, and a chat assistant offering help in the corner.",
+      width: 1860,
+      height: 943,
+    },
     detail: {
       problem:
         "A clinic system for One-Rad Medical Clinic QC covering registration, scheduling, billing and records, with a patient pre-assessment step before consultation.",

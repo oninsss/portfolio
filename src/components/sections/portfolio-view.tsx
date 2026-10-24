@@ -34,6 +34,7 @@ export function HeroPhoto() {
             fill
             loading="eager"
             fetchPriority="high"
+            quality={90}
             sizes="(min-width: 1024px) 240px, (min-width: 480px) 176px, calc(100vw - 2.5rem)"
             style={
               {

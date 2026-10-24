@@ -23,13 +23,15 @@ function ProjectPreview({ project }: { project: Project }) {
 
   if (preview) {
     return (
-      <div className="relative mt-5 aspect-video w-full overflow-hidden border border-rule">
+      <div className="mt-5 w-full overflow-hidden border border-rule">
         <Image
           src={preview.src}
           alt={preview.alt}
-          fill
+          width={preview.width}
+          height={preview.height}
+          quality={90}
           sizes="(max-width: 1024px) 100vw, 44rem"
-          className="object-cover"
+          className="block h-auto w-full"
         />
       </div>
     );
