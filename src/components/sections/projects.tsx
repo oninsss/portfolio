@@ -22,17 +22,46 @@ function ProjectPreview({ project }: { project: Project }) {
   const preview = project.preview;
 
   if (preview) {
+    const image = (
+      <Image
+        src={preview.src}
+        alt={preview.alt}
+        width={preview.width}
+        height={preview.height}
+        quality={90}
+        sizes="(max-width: 1024px) 100vw, 44rem"
+        className="block h-auto w-full"
+      />
+    );
+
+    // The first project link (the live demo) is also reachable from the image.
+    const link = project.links[0];
+    if (link) {
+      return (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group/preview relative mt-5 block w-full overflow-hidden border border-rule transition-colors duration-200 hover:border-accent"
+        >
+          {image}
+          <span className="sr-only">
+            {link.label}, opens in a new tab
+          </span>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute bottom-2 right-2 inline-flex items-center gap-1 border border-rule bg-canvas px-2 py-1 text-xs text-ink opacity-0 transition-opacity duration-200 group-hover/preview:opacity-100 group-focus-visible/preview:opacity-100"
+          >
+            {link.label}
+            <IconArrowUpRight size={12} />
+          </span>
+        </a>
+      );
+    }
+
     return (
       <div className="mt-5 w-full overflow-hidden border border-rule">
-        <Image
-          src={preview.src}
-          alt={preview.alt}
-          width={preview.width}
-          height={preview.height}
-          quality={90}
-          sizes="(max-width: 1024px) 100vw, 44rem"
-          className="block h-auto w-full"
-        />
+        {image}
       </div>
     );
   }
