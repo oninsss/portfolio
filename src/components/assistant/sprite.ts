@@ -13,14 +13,14 @@ const BODY = [
   "......AA......",
   "..LLLLLLLLLL..",
   ".LLLLLLLLLLLS.",
-  "LBDDDDDDDDDDBS",
-  "LBDDDDDDDDDDBS",
-  "LBDDDDDDDDDDBS",
-  "LBDDDDDDDDDDBS",
-  "LBDDDDDDDDDDBS",
-  "LBDDDDDDDDDDBS",
-  "LBDDDDDDDDDDBS",
-  "LBBBBBBBBBBBBS",
+  ".BDDDDDDDDDDS.",
+  ".BDDDDDDDDDDS.",
+  ".BDDDDDDDDDDS.",
+  ".BDDDDDDDDDDS.",
+  ".BDDDDDDDDDDS.",
+  ".BDDDDDDDDDDS.",
+  ".BDDDDDDDDDDS.",
+  ".BBBBBBBBBBBS.",
   "..SSSSSSSSSS..",
   "...SS....SS...",
   "...SS....SS...",
@@ -75,18 +75,23 @@ export const BLINK: Cell[] = EYES_SHUT;
 /** Alternates with the pose's mouth while the guide is talking. */
 export const TALK: Cell[] = [[6, 7], [7, 7], [6, 8], [7, 8]];
 
-const arm = (x: number, top: number): Cell[] => [
-  [x, top],
-  [x, top + 1],
-  [x, top + 2],
-];
+/** An arm hangs outside the body: two pixels of sleeve, then a lighter hand. */
+type Arm = { arm: Cell[]; hand: Cell[] };
 
-export const ARMS = {
-  restLeft: arm(0, 6),
-  restRight: arm(13, 6),
-  upLeft: arm(0, 3),
-  upRight: arm(13, 3),
-  highRight: arm(13, 2),
+const limb = (x: number, hand: number, down: boolean): Arm => ({
+  arm: down ? [[x, hand - 2], [x, hand - 1]] : [[x, hand + 2], [x, hand + 3]],
+  hand: [[x, hand], [x, hand + 1]],
+});
+
+export const ARMS: Record<
+  "restLeft" | "restRight" | "upLeft" | "upRight" | "highRight",
+  Arm
+> = {
+  restLeft: limb(0, 8, true),
+  restRight: limb(13, 8, true),
+  upLeft: limb(0, 1, false),
+  upRight: limb(13, 1, false),
+  highRight: limb(13, 0, false),
 };
 
 /** One SVG path per colour role: every horizontal run of pixels becomes one rectangle. */
