@@ -234,8 +234,8 @@ descriptive alt text, and ARIA only where native elements are not enough.
 Decisions that are in place but not final:
 
 - **Accent color** is a temporary purple.
-- **Photo** is temporary, stored as `temp-profile.jpg`.
-- **Résumé** download serves `public/Bonagua_Antonino_Resume-Public.pdf`, a temporary version (it still contains a `[Portfolio URL]` placeholder) to be replaced under the same filename.
+- **Photo** may still change. The portraits in `public/profile/` are background-removed cutouts at 1536×1920 (one per theme), made from full-size originals kept locally in `design/source/` (gitignored). They are served at quality 90 (`images.qualities` in `next.config.ts`).
+- **Résumé** download serves `public/Bonagua_Antonino_Resume-Public.pdf`; replace the file under the same name to update it.
 - **Name:** the visible name is "onins"; metadata uses "Antoniño Bonagua".
 - **Hero lead lines** are drafts for the developer to edit.
 - **Share image** is generated from the robot, name and role; a different one can
