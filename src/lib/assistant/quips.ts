@@ -128,7 +128,7 @@ function buildHome(): Candidate[] {
         true,
         quip(
           "home:layers",
-          `Across ${list(stack.map((row) => row.label.toLowerCase()))}: that's the range.`,
+          `Across ${list(stack.map((row) => row.label))}: that's the range.`,
           "smile",
         ),
       ),
