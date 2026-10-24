@@ -121,9 +121,12 @@ export function Projects({ items }: ProjectsProps) {
                         <li key={link.label}>
                           <a
                             href={link.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="text-[0.8125rem] text-ink-muted underline decoration-rule underline-offset-4 transition-[color,text-decoration-color,text-underline-offset] duration-200 hover:text-accent hover:decoration-accent hover:underline-offset-2"
                           >
                             {link.label}
+                            <span className="sr-only"> (opens in a new tab)</span>
                             <IconArrowUpRight size={13} />
                           </a>
                         </li>
