@@ -1,66 +1,101 @@
-# Portfolio
+# onins — Portfolio
 
-A one-page portfolio for onins (Antoniño Bonagua), Full Stack Developer: a modern résumé redesigned as a website, with light, dark and system themes, an interactive pixel-art guide, and a contact form.
+A one-page portfolio for **Antoniño Bonagua (onins), Full Stack Developer**: a modern résumé redesigned as a website.
 
-Built with Next.js 16 (App Router), React 19, TypeScript, and Tailwind CSS v4. Design notes are in [`design/DESIGN.md`](design/DESIGN.md) and the working rules are in [`AGENTS.md`](AGENTS.md).
+**Live site: [onins.dev](https://onins.dev)**
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="design/screenshots/hero-dark.webp">
+  <img src="design/screenshots/hero-light.webp" alt="The portfolio's top section: a portrait, the name onins with a small pixel-art guide beside it, the role, a short introduction, the stack strip, and links to GitHub, LinkedIn, email and the résumé.">
+</picture>
+
+## What it is
+
+Six sections on a single page: introduction, experience, projects, certifications, tech stack and contact. It reads like a résumé first, and the page design stays out of the way: editorial type, hairline rules, one accent color, and almost no cards.
+
+- **Pixel-art guide.** A small 14×14 pixel cube that lives beside the name. Click it for a menu, and it flies you to a section. It also comments on the page now and then. Everything it says is generated from the same content the page shows, never repeats a line until it has run through the pool, and it can't claim anything the page doesn't.
+- **Tech stack matrix.** Technologies grouped by layer, against projects and roles. Select a project or role to see only what it used.
+- **Light, dark and system themes**, applied before first paint so there is no flash.
+- **Accessible by default.** Semantic landmarks, a skip link, visible focus states, labelled disclosures, and every animation respects `prefers-reduced-motion`.
+- **A contact form that keeps the email address private.** The form is a Server Action validated with Zod and sent through the Mailtrap API. The public email address is never in the source, the HTML or the JavaScript bundle; the server hands it over on a visitor's first hover, focus or touch.
+- **Search and sharing.** Metadata, a generated Open Graph image, sitemap, `robots.txt` and `Person` / `WebSite` structured data, all built only from facts already on the page.
+
+## Built with
+
+| | |
+| --- | --- |
+| Framework | [Next.js](https://nextjs.org) 16 (App Router), React 19 |
+| Language | TypeScript 5 (strict) |
+| Styling | Tailwind CSS v4 (CSS-first config, no `tailwind.config`) |
+| Validation | [Zod](https://zod.dev) 4 |
+| Email | [Mailtrap](https://mailtrap.io) REST API through `fetch` (no email SDK) |
+| Tooling | ESLint 9 (flat config), npm |
+
+There is no database, CMS, component library or state-management library. The site is static content plus the Server Actions behind the contact form.
+
+## Project structure
+
+```text
+src/
+  app/            routes, layout, globals.css, the contact Server Action, metadata files
+  components/     assistant/ (the guide), contact/, hero/, sections/, layout/, shared/
+  content/        all facts shown on the site, one typed file per domain
+  lib/            site config, contact module, the guide's logic (lib/assistant/)
+public/           portrait, certificate badges, project preview, résumé PDF
+design/           DESIGN.md (the design spec) and README screenshots
+```
+
+All content lives in [`src/content/`](src/content) (`profile`, `experience`, `projects`, `certifications`, `skills`, `links`) and components only read from it. Nothing is invented: anything not yet supplied is omitted or shown as a clearly marked placeholder.
 
 ## Getting started
 
-Requires Node.js 20.9 or newer and npm.
+Requires Node.js 20.9 or newer.
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+| Script | |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` / `npm run start` | Production build / serve it |
+| `npm run lint` | ESLint |
+| `npm run typecheck` | `next typegen` + `tsc --noEmit` |
 
-## Scripts
+There is no test runner yet.
 
-```bash
-npm run dev        # start the dev server
-npm run build      # production build
-npm run start      # serve the production build
-npm run lint       # ESLint
-npm run typecheck  # next typegen + tsc --noEmit
-```
-
-There is no test runner.
-
-## Editing content
-
-All content lives in [`src/content/`](src/content), one file per domain: `profile`, `experience`, `projects`, `certifications`, `skills`, and `links`. Nothing is invented; anything not yet supplied is a bracketed placeholder (for example `[dates]`) or is omitted.
+### Editing content
 
 | To change | Do this |
 | --- | --- |
-| Résumé download | The button serves `public/Bonagua_Antonino_Resume-Public.pdf` and saves it for the visitor as `Bonagua_Antonino_Resume.pdf` (both set by `resumeFile` in `src/content/profile.ts`). To update the résumé, replace the file under the same name. |
-| Profile photo | Replace the file in `public/` and update `portrait.src` in `src/content/profile.ts`. |
-| Certificate badges | Images live in `public/badges/`; each certification's `badge` and `credentialUrl` are set in `src/content/certifications.ts`. |
+| Text, projects, experience, certifications | Edit the matching file in `src/content/`. |
+| Résumé | Replace `public/Bonagua_Antonino_Resume-Public.pdf`, keeping the filename (set by `resumeFile` in `src/content/profile.ts`). |
+| Portrait | Replace the two files in `public/profile/` and update `portrait` in `src/content/profile.ts`. |
+| Certificate badges | Images are in `public/badges/`; set each `badge` and `credentialUrl` in `src/content/certifications.ts`. |
+| Project preview | Add the image to `public/projects/` and set `preview` (with `width` and `height`) on the project. |
 
-## Environment variables
+### Environment variables
 
-Set these in your host's environment settings, never in the repository. Only `NEXT_PUBLIC_SITE_URL` is safe to expose; the others are server-only and must never have a `NEXT_PUBLIC_` prefix.
+Set these in your host's settings, or in a git-ignored `.env.local` for development. Never commit them. Only `NEXT_PUBLIC_SITE_URL` is public; the rest are server-only and must never get a `NEXT_PUBLIC_` prefix.
 
-| Variable | Required | Purpose |
+| Variable | Needed for | Purpose |
 | --- | --- | --- |
-| `MAILTRAP_API_KEY` | for the contact form | API token from [Mailtrap](https://mailtrap.io/api-tokens). Use a Sending token for real delivery, or a Sandbox token together with `MAILTRAP_INBOX_ID` for testing |
-| `MAILTRAP_INBOX_ID` | no | Numeric ID of a Mailtrap Sandbox inbox. When set, messages are captured in that inbox instead of being delivered. Leave unset in production |
-| `CONTACT_TO_EMAIL` | for the contact form | Where contact-form messages are delivered |
-| `CONTACT_PUBLIC_EMAIL` | for the email links | The address visitors see and can write to. Use a dedicated address, such as a separate inbox for the portfolio, not your personal one. It is never in the repository, the HTML, or the JavaScript bundle: the server returns it on a visitor's first hover, focus, or touch. If unset, the email options say they are unavailable. |
-| `CONTACT_FROM_EMAIL` | for live sending | Sender shown on messages, as `Portfolio <address@your-domain.com>` or a bare address, on a domain verified in Mailtrap. Optional with `MAILTRAP_INBOX_ID`, where any sender works |
-| `NEXT_PUBLIC_SITE_URL` | no | The site's public address, for example `https://your-domain.com`. Drives the canonical URL, social-share URLs, sitemap, and structured data. On Vercel, if unset, the production domain Vercel provides is used. If neither is available, those URL-dependent tags are left out. |
+| `MAILTRAP_API_KEY` | contact form | A Mailtrap API token. Use a Sending token for real delivery, or a Sandbox token with `MAILTRAP_INBOX_ID` for testing. |
+| `MAILTRAP_INBOX_ID` | testing only | Numeric ID of a Sandbox inbox. When set, messages land in that inbox instead of being delivered. Leave unset in production. |
+| `CONTACT_TO_EMAIL` | contact form | Where form messages are delivered. |
+| `CONTACT_FROM_EMAIL` | live sending | Sender shown on messages, such as `Portfolio <address@your-domain.com>`, on a domain verified in Mailtrap. |
+| `CONTACT_PUBLIC_EMAIL` | email links | The address visitors see. Use a dedicated address, not a personal one. Without it, the email options say they are unavailable. |
+| `NEXT_PUBLIC_SITE_URL` | canonical URLs | The site's public address, for example `https://onins.dev`. Drives the canonical URL, sitemap and structured data. On Vercel it falls back to the production domain Vercel provides. |
 
-In production, without `MAILTRAP_API_KEY`, `CONTACT_TO_EMAIL`, and a valid sender, the contact form tells visitors it is unavailable. In development the message is logged to the server console instead. Without `CONTACT_PUBLIC_EMAIL`, the email options say so, and LinkedIn and GitHub still work. Set `CONTACT_PUBLIC_EMAIL` before the first deploy.
+In production, without a Mailtrap key, a recipient and a valid sender, the form tells visitors it is unavailable. In development the message is logged to the server console instead.
 
-For local development, create a `.env.local` file in the project root (it is git-ignored) with the same names and your own values. Keep real values out of any committed file.
+## Deploying
 
-## Deploying to Vercel
+Set up for [Vercel](https://vercel.com): import the repository with the Next.js preset (the default build settings are correct), add the variables above under **Project Settings → Environment Variables**, and redeploy after changing any of them. `NEXT_PUBLIC_SITE_URL` is read at build time. Set `CONTACT_PUBLIC_EMAIL` before the first deploy.
 
-1. Push the repository to GitHub, GitLab or Bitbucket and import it in Vercel. Framework preset: Next.js; the default build command and output are correct.
-2. In **Project Settings → Environment Variables**, add the variables above. They are set in Vercel separately from `.env.local`, which is not deployed. Add them for **Production**, and for **Preview** only if you want preview deployments to send real emails.
-3. Redeploy after changing any variable. `NEXT_PUBLIC_SITE_URL` is read at build time.
-4. If you add a custom domain later, set `NEXT_PUBLIC_SITE_URL` to it and redeploy so the canonical URL and sitemap use it.
+## Project docs and workflow
 
-## Search and sharing
-
-The site ships with a title and description, Open Graph and Twitter cards with a generated share image (`src/app/opengraph-image.tsx`), icons, `robots.txt`, `sitemap.xml`, `Person` and `WebSite` structured data, and a custom 404 page. Preview deployments on Vercel are not indexed by default. After launch, check the result with a social-card debugger and Google Search Console; metadata and structured data help search engines understand the page but do not guarantee rankings or rich results.
+- [`design/DESIGN.md`](design/DESIGN.md) is the design spec: tokens, layout, motion and how the guide behaves.
+- [`AGENTS.md`](AGENTS.md) and [`CLAUDE.md`](CLAUDE.md) hold the working rules for AI coding assistants used on this repository: stack, content, security and verification rules.
+- Git-flow: day-to-day work goes on `feature/*` and `fix/*` branches off `develop`, and releases are merged into `main`.
