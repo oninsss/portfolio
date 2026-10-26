@@ -1,9 +1,22 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
 import type { Project } from "@/content";
-import { IconArrowUpRight } from "@/components/shared/icons";
+import {
+  IconArrowUpRight,
+  IconPause,
+  IconPlay,
+} from "@/components/shared/icons";
+
+const prefersReducedMotion = () =>
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function subscribeReducedMotion(onChange: () => void) {
+  const query = window.matchMedia("(prefers-reduced-motion: reduce)");
+  query.addEventListener("change", onChange);
+  return () => query.removeEventListener("change", onChange);
+}
 
 type ProjectsProps = {
   items: Project[];
@@ -18,10 +31,98 @@ function detailFields(project: Project) {
   ].filter((field): field is { label: string; value: string } => !!field.value);
 }
 
+function ProjectPreviewVideo({
+  preview,
+  link,
+}: {
+  preview: NonNullable<Project["preview"]>;
+  link?: Project["links"][number];
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [paused, setPaused] = useState(false);
+  const reduced = useSyncExternalStore(
+    subscribeReducedMotion,
+    prefersReducedMotion,
+    () => false,
+  );
+
+  const frame = reduced ? (
+    <Image
+      src={preview.poster ?? preview.src}
+      alt={preview.alt}
+      width={preview.width}
+      height={preview.height}
+      quality={90}
+      sizes="(max-width: 1024px) 100vw, 44rem"
+      className="block h-auto w-full"
+    />
+  ) : (
+    <>
+      <video
+        ref={videoRef}
+        src={preview.src}
+        poster={preview.poster}
+        width={preview.width}
+        height={preview.height}
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+        tabIndex={-1}
+        className="block h-auto w-full"
+      />
+      <span className="sr-only">{preview.alt}</span>
+      <button
+        type="button"
+        aria-pressed={paused}
+        aria-label={paused ? "Play the preview" : "Pause the preview"}
+        title={paused ? "Play" : "Pause"}
+        onClick={() => {
+          const el = videoRef.current;
+          if (!el) return;
+          if (paused) {
+            el.play();
+          } else {
+            el.pause();
+          }
+          setPaused((value) => !value);
+        }}
+        className="absolute bottom-2 left-2 z-10 flex h-7 w-7 cursor-pointer items-center justify-center border border-rule bg-canvas text-ink-muted transition-colors duration-150 hover:text-accent"
+      >
+        {paused ? <IconPlay size={12} /> : <IconPause size={12} />}
+      </button>
+    </>
+  );
+
+  return (
+    <div className="relative mt-5 w-full overflow-hidden border border-rule">
+      {frame}
+      {link ? (
+        <a
+          href={link.href}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group/preview absolute bottom-2 right-2 z-10 inline-flex items-center gap-1 border border-rule bg-canvas px-2 py-1 text-xs text-ink-muted transition-colors duration-200 hover:border-accent hover:text-accent"
+        >
+          {link.label}
+          <span className="sr-only">, opens in a new tab</span>
+          <IconArrowUpRight size={12} />
+        </a>
+      ) : null}
+    </div>
+  );
+}
+
 function ProjectPreview({ project }: { project: Project }) {
   const preview = project.preview;
+  const link = project.links[0];
 
   if (preview) {
+    if (preview.kind === "video") {
+      return <ProjectPreviewVideo preview={preview} link={link} />;
+    }
+
     const image = (
       <Image
         src={preview.src}
@@ -35,7 +136,6 @@ function ProjectPreview({ project }: { project: Project }) {
     );
 
     // The first project link (the live demo) is also reachable from the image.
-    const link = project.links[0];
     if (link) {
       return (
         <a
