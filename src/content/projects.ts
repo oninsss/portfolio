@@ -34,4 +34,36 @@ export const projects: Project[] = [
         "Project stack: an Express API and PostgreSQL backend with a Next.js (React) front end; WebSockets for real-time updates; OpenAI / GPT-4o for the pre-assessment conversation; PayMongo for payments; deployed on AWS EC2.",
     },
   },
+  {
+    id: "modu",
+    name: "Modu",
+    short: "Modu",
+    summary: "Modu: one place for your tasks, projects, calendar and habits",
+    technologies: [
+      "Next.js",
+      "React",
+      "Supabase",
+      "TypeScript",
+      "Tailwind CSS",
+      "Vercel",
+    ],
+    links: [{ label: "Live demo", href: "https://dashboard.onins.dev" }],
+    preview: {
+      kind: "video",
+      src: "/projects/modu.mp4",
+      poster: "/projects/modu-poster.webp",
+      alt: "The Modu landing page, showing the app's tasks, projects, calendar and habits in one personal dashboard.",
+      width: 1920,
+      height: 1080,
+    },
+    detail: {
+      problem:
+        "Most productivity tools make you adapt to their system. This one flips it: tasks, projects, and a calendar that adapt to how you actually want to plan your day.",
+      built:
+        "A solo project, built end to end: the Next.js front end, the Supabase backend and auth, and the deploy to Vercel. Tasks, projects, and a calendar brought together in one dashboard, kept flexible so the user can organize their day their own way.",
+      role: "Solo developer, from specification through production deployment.",
+      implementation:
+        "Project stack: a Next.js (React, TypeScript) front end with a Supabase (Postgres, Auth) backend behind an internal API; deployed on Vercel.",
+    },
+  },
 ];
