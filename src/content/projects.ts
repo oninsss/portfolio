@@ -38,16 +38,17 @@ export const projects: Project[] = [
     id: "modu",
     name: "Modu",
     short: "Modu",
-    summary: "Modu: one place for your tasks, projects, calendar and habits",
+    summary: "Your work. Your flow. Your way.",
     technologies: [
       "Next.js",
       "React",
-      "Supabase",
       "TypeScript",
+      "Supabase",
+      "PostgreSQL",
       "Tailwind CSS",
       "Vercel",
     ],
-    links: [{ label: "Live demo", href: "https://dashboard.onins.dev" }],
+    links: [{ label: "Visit site", href: "https://dashboard.onins.dev" }],
     preview: {
       kind: "video",
       src: "/projects/modu.mp4",
@@ -58,12 +59,12 @@ export const projects: Project[] = [
     },
     detail: {
       problem:
-        "Most productivity tools make you adapt to their system. This one flips it: tasks, projects, and a calendar that adapt to how you actually want to plan your day.",
+        "Productivity tools often require users to adapt to predefined workflows. Modu takes a different approach: bringing tasks, projects, calendar, and habits into one workspace designed around flexibility and personal organization.",
       built:
-        "A solo project, built end to end: the Next.js front end, the Supabase backend and auth, and the deploy to Vercel. Tasks, projects, and a calendar brought together in one dashboard, kept flexible so the user can organize their day their own way.",
-      role: "Solo developer, from specification through production deployment.",
+        "Designed and built Modu independently, from specification through production deployment. Developed the frontend, backend, authentication, and core application architecture, integrating the essential tools for personal productivity into a unified workspace.",
+      role: "Solo Full-Stack Developer — responsible for product specification, end-to-end implementation, backend and database integration, authentication, and production deployment.",
       implementation:
-        "Project stack: a Next.js (React, TypeScript) front end with a Supabase (Postgres, Auth) backend behind an internal API; deployed on Vercel.",
+        "Built with Next.js, React, and TypeScript, backed by Supabase for PostgreSQL database management and authentication. Implemented a server-side API layer to support application functionality and deployed the application on Vercel.",
     },
   },
 ];

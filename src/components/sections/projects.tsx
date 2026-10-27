@@ -1,13 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState, useSyncExternalStore } from "react";
+import { useState, useSyncExternalStore } from "react";
 import type { Project } from "@/content";
-import {
-  IconArrowUpRight,
-  IconPause,
-  IconPlay,
-} from "@/components/shared/icons";
+import { IconArrowUpRight } from "@/components/shared/icons";
 
 const prefersReducedMotion = () =>
   window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -38,8 +34,6 @@ function ProjectPreviewVideo({
   preview: NonNullable<Project["preview"]>;
   link?: Project["links"][number];
 }) {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const [paused, setPaused] = useState(false);
   const reduced = useSyncExternalStore(
     subscribeReducedMotion,
     prefersReducedMotion,
@@ -59,7 +53,6 @@ function ProjectPreviewVideo({
   ) : (
     <>
       <video
-        ref={videoRef}
         src={preview.src}
         poster={preview.poster}
         width={preview.width}
@@ -73,25 +66,6 @@ function ProjectPreviewVideo({
         className="block h-auto w-full"
       />
       <span className="sr-only">{preview.alt}</span>
-      <button
-        type="button"
-        aria-pressed={paused}
-        aria-label={paused ? "Play the preview" : "Pause the preview"}
-        title={paused ? "Play" : "Pause"}
-        onClick={() => {
-          const el = videoRef.current;
-          if (!el) return;
-          if (paused) {
-            el.play();
-          } else {
-            el.pause();
-          }
-          setPaused((value) => !value);
-        }}
-        className="absolute bottom-2 left-2 z-10 flex h-7 w-7 cursor-pointer items-center justify-center border border-rule bg-canvas text-ink-muted transition-colors duration-150 hover:text-accent"
-      >
-        {paused ? <IconPlay size={12} /> : <IconPause size={12} />}
-      </button>
     </>
   );
 
