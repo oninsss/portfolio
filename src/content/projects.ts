@@ -48,7 +48,7 @@ export const projects: Project[] = [
       "Tailwind CSS",
       "Vercel",
     ],
-    links: [{ label: "Visit site", href: "https://dashboard.onins.dev" }],
+    links: [{ label: "Visit site", href: "https://modu.onins.dev" }],
     preview: {
       kind: "video",
       src: "/projects/modu.mp4",
